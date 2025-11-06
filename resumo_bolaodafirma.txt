@@ -1,0 +1,60 @@
+
+Resumo Técnico: bolaodafirma.com
+
+Objetivo:
+Organizar bolões lotéricos entre colegas de trabalho e amigos, com segurança, transparência e proporcionalidade na divisão de cotas e prêmios.
+
+Passo 1: Criação da Pool
+- Organizer define nome, tipo de loteria, datas, valor mínimo/máximo por cota, palavra-chave e WhatsApp.
+- Verificação via WhatsApp obrigatória.
+
+Passo 2: Entrada do Player
+- Player informa nome, apelido único, WhatsApp e valor máximo a apostar (≥ minValuePerShare).
+- Verificação via WhatsApp e uso da palavra-chave.
+
+Passo 3: Período de Inscrição
+- Sistema soma os valores máximos dos Players.
+- Calcula montante total disponível.
+- Simula jogos possíveis com base na tabela oficial da loteria.
+
+Passo 4: Finalização da Pool
+- Sistema define os jogos possíveis com o montante.
+- Exibe composição dos jogos e custo total.
+
+Passo 5: Cotização e Distribuição
+- Valor total dos jogos dividido em unidades de R$0,01.
+- Distribuição proporcional aos Players com base em maxValueToBet.
+- Exibição do valor final por Player e % do prêmio.
+
+Passo 6: Geração e Registro dos Jogos
+- Sistema gera os jogos (automático ou manual).
+- Registra e exibe os jogos vinculados à Pool.
+
+Passo 7: Pagamento
+- Sistema gera QR Code PIX com valor exato da cota.
+- Envia via WhatsApp.
+- Organizer confirma pagamento manualmente ou via integração.
+
+Passo 8: Pós-Sorteio
+- Organizer registra resultado.
+- Sistema calcula valor líquido do prêmio.
+- Distribui proporcionalmente conforme cotas.
+- Exibe relatório da divisão do prêmio.
+
+Distribuição de Cotas:
+- Cotas distribuídas proporcionalmente ao valor máximo de cada Player.
+- Exemplo: R$1158 arrecadados → 1158 cotas de R$0,01.
+- Cada Player recebe cotas conforme sua contribuição.
+- Em caso de prêmio, sistema calcula % correspondente a cada Player.
+
+Observações Técnicas:
+- Criptografia de dados sensíveis (PIX, WhatsApp).
+- Tokens temporários para verificação via WhatsApp.
+- Auditoria de cotas e pagamentos.
+- Exportação de relatórios.
+
+Futuras Expansões:
+- Dashboard geográfico de bolões.
+- Histórico de Pools e prêmios.
+- Integração com API da Caixa.
+- Gamificação entre organizadores.
