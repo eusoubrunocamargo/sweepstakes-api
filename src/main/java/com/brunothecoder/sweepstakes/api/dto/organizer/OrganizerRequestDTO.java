@@ -3,7 +3,7 @@ package com.brunothecoder.sweepstakes.api.dto.organizer;
 
 import jakarta.validation.constraints.NotBlank;
 
-public record CreateOrganizerRequest(
+public record OrganizerRequestDTO(
         @NotBlank String name,
         @NotBlank String whatsapp,
         @NotBlank String keyword

@@ -93,7 +93,22 @@
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
-			<plugin>
+
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>11.7.2</version>
+                <configuration>
+                    <url>jdbc:mysql://localhost:3306/sweepstakes_api</url>
+                    <user>root</user>
+                    <password>root</password>
+                    <schemas>
+                        <schema>sweepstakes</schema>
+                    </schemas>
+                </configuration>
+            </plugin>
+
+            <plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>

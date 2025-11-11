@@ -1,7 +1,7 @@
 package com.brunothecoder.sweepstakes.api.controllers;
 
-import com.brunothecoder.sweepstakes.api.dto.organizer.CreateOrganizerRequest;
-import com.brunothecoder.sweepstakes.api.dto.organizer.OrganizerResponse;
+import com.brunothecoder.sweepstakes.api.dto.organizer.OrganizerRequestDTO;
+import com.brunothecoder.sweepstakes.api.dto.organizer.OrganizerResponseDTO;
 import com.brunothecoder.sweepstakes.api.mappers.OrganizerMapper;
 import com.brunothecoder.sweepstakes.application.services.OrganizerService;
 import com.brunothecoder.sweepstakes.domain.entities.Organizer;
@@ -25,7 +25,7 @@ public class OrganizerController {
     }
 
     @GetMapping
-    public ResponseEntity<List<OrganizerResponse>>list(){
+    public ResponseEntity<List<OrganizerResponseDTO>>list(){
         return ResponseEntity.ok(service
                 .list()
                 .stream()
@@ -34,7 +34,7 @@ public class OrganizerController {
     }
 
     @PostMapping
-    public ResponseEntity<OrganizerResponse>create(@Valid @RequestBody CreateOrganizerRequest request){
+    public ResponseEntity<OrganizerResponseDTO>create(@Valid @RequestBody OrganizerRequestDTO request){
         Organizer saved = service.create(mapper.toEntity(request));
         return ResponseEntity.created(URI.create(
                 "/v1/organizer" + saved.getId()))

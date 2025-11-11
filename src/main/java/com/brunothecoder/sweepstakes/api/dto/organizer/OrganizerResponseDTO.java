@@ -1,9 +1,10 @@
 package com.brunothecoder.sweepstakes.api.dto.organizer;
 
-public record OrganizerResponse(
+public record OrganizerResponseDTO(
         String id,
         String name,
         String whatsapp,
-        String keyword
+        String keyword,
+        Boolean validatedUser
 ) {
 }

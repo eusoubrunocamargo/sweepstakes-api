@@ -1,12 +1,9 @@
 package com.brunothecoder.sweepstakes.domain.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -15,8 +12,9 @@ import java.util.UUID;
 @EqualsAndHashCode(of = "id")
 @Getter
 @Setter
-@Entity(name = "organizer")
-public class Organizer {
+@Entity
+@Table(name = "player")
+public class Player {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -29,18 +27,11 @@ public class Organizer {
 
     @NotBlank
     @Size(max = 20)
-    @Pattern(regexp = "^\\+55\\d{10,11}$")
+    @Pattern(regexp = "^\\+55\\d{11}$")
     @Column(nullable = false, length = 20)
     private String whatsapp;
 
     @Column(nullable = false)
     private boolean validatedUser;
-
-    @NotBlank
-    @Size(max = 100)
-    @Column(nullable = false, length = 100)
-    private String keyword;
-
-    private LocalDateTime createdAt;
 
 }
