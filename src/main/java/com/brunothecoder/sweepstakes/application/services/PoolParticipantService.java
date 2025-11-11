@@ -14,6 +14,7 @@ import com.brunothecoder.sweepstakes.domain.repositories.PoolRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -26,19 +27,23 @@ public class PoolParticipantService {
     private final PoolRepository poolRepository;
     private final OrganizerRepository organizerRepository;
     private final PoolParticipantMapper poolParticipantMapper;
+    private final PoolService poolService;
 
     public PoolParticipantService(
             PoolParticipantRepository poolParticipantRepository,
             PlayerRepository playerRepository,
             PoolRepository poolRepository,
             OrganizerRepository organizerRepository,
-            PoolParticipantMapper poolParticipantMapper
+            PoolParticipantMapper poolParticipantMapper,
+            PoolService poolService
+
     ){
         this.poolParticipantRepository = poolParticipantRepository;
         this.playerRepository = playerRepository;
         this.poolRepository = poolRepository;
         this.organizerRepository = organizerRepository;
         this.poolParticipantMapper = poolParticipantMapper;
+        this.poolService = poolService;
     }
 
     public PoolParticipantResponseDTO joinPool(
@@ -62,6 +67,9 @@ public class PoolParticipantService {
         PoolParticipant poolParticipant = poolParticipantMapper.toEntity(poolParticipantRequestDTO, player, pool);
         poolParticipant.setJoinedAt(LocalDateTime.now());
         poolParticipantRepository.save(poolParticipant);
+
+        //update cache with totalAmount
+        BigDecimal updatedTotal = poolService.calculateTotalAmount(poolId);
         return poolParticipantMapper.toResponse(poolParticipant);
     }
 
