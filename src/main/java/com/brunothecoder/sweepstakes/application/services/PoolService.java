@@ -78,10 +78,11 @@ public class PoolService {
     }
 
     public BigDecimal getCachedTotalAmount(UUID poolId){
-        Map<Object, Object> stats = poolCacheService.getPoolStats(poolId);
-        if(stats.containsKey("totalAmount")){
-            return new BigDecimal(stats.get("totalAmount").toString());
-        }
-        throw new IllegalStateException("No cached totalAmount for pool " + poolId);
+        return calculateTotalAmount(poolId);
+//        Map<Object, Object> stats = poolCacheService.getPoolStats(poolId);
+//        if(stats.containsKey("totalAmount")){
+//            return new BigDecimal(stats.get("totalAmount").toString());
+//        }
+//        throw new IllegalStateException("No cached totalAmount for pool " + poolId);
     }
 }
