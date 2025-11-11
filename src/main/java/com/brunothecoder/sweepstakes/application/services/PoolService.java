@@ -57,13 +57,6 @@ public class PoolService {
     }
 
     public BigDecimal calculateTotalAmount(UUID poolId){
-
-        //check if value is in cache
-        Map<Object, Object> cachedStats = poolCacheService.getPoolStats(poolId);
-        if (cachedStats.containsKey("totalAmount")){
-            return new BigDecimal(cachedStats.get("totalAmount").toString());
-        }
-
         //calc total amount
         BigDecimal totalAmount = poolParticipantRepository.findAllByPoolId(poolId)
                 .stream()
