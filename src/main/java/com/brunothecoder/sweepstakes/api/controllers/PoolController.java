@@ -1,5 +1,6 @@
 package com.brunothecoder.sweepstakes.api.controllers;
 
+import com.brunothecoder.sweepstakes.api.dto.megasena.GameDistributionResponseDTO;
 import com.brunothecoder.sweepstakes.api.dto.pool.PoolRequestDTO;
 import com.brunothecoder.sweepstakes.api.dto.pool.PoolResponseDTO;
 import com.brunothecoder.sweepstakes.application.services.PoolService;
@@ -40,4 +41,11 @@ public class PoolController {
         BigDecimal total = poolService.getCachedTotalAmount(poolId);
         return ResponseEntity.ok(total);
     }
+
+    @GetMapping("/{poolId}/game-distribution")
+    public ResponseEntity<GameDistributionResponseDTO> getGameDistribution(@PathVariable UUID poolId){
+        GameDistributionResponseDTO response = poolService.calculateGameDistribution(poolId);
+        return ResponseEntity.ok(response);
+    }
+
 }
