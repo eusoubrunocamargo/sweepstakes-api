@@ -3,22 +3,24 @@ package com.brunothecoder.sweepstakes.application.services;
 import com.brunothecoder.sweepstakes.api.dto.megasena.GameDistributionResponseDTO;
 import com.brunothecoder.sweepstakes.api.dto.pool.PoolRequestDTO;
 import com.brunothecoder.sweepstakes.api.dto.pool.PoolResponseDTO;
+import com.brunothecoder.sweepstakes.api.dto.pool_participant.PoolParticipantRequestDTO;
+import com.brunothecoder.sweepstakes.api.exceptions.ErrorMessages;
 import com.brunothecoder.sweepstakes.api.mappers.GameDistributionMapper;
 import com.brunothecoder.sweepstakes.api.mappers.PoolMapper;
+import com.brunothecoder.sweepstakes.api.mappers.PoolParticipantMapper;
 import com.brunothecoder.sweepstakes.application.services.cache.PoolCacheService;
 import com.brunothecoder.sweepstakes.application.services.calculators.GameDistributionResult;
 import com.brunothecoder.sweepstakes.application.services.calculators.MegaSenaCalculator;
-import com.brunothecoder.sweepstakes.domain.entities.Organizer;
-import com.brunothecoder.sweepstakes.domain.entities.Pool;
-import com.brunothecoder.sweepstakes.domain.entities.PoolParticipant;
-import com.brunothecoder.sweepstakes.domain.repositories.OrganizerRepository;
+import com.brunothecoder.sweepstakes.domain.entities.*;
 import com.brunothecoder.sweepstakes.domain.repositories.PoolParticipantRepository;
 import com.brunothecoder.sweepstakes.domain.repositories.PoolRepository;
+import com.brunothecoder.sweepstakes.domain.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -29,33 +31,64 @@ public class PoolService {
 
     private final PoolRepository poolRepository;
     private final PoolMapper poolMapper;
-    private final OrganizerRepository organizerRepository;
+    private final UserRepository userRepository;
     private final PoolParticipantRepository poolParticipantRepository;
-    private final PoolCacheService poolCacheService;
+//    private final PoolCacheService poolCacheService;
     private final MegaSenaCalculator megaSenaCalculator;
+    private final PoolParticipantMapper poolParticipantMapper;
 
     public PoolService(
             PoolRepository poolRepository,
             PoolMapper poolMapper,
-            OrganizerRepository organizerRepository,
+            UserRepository userRepository,
             PoolParticipantRepository poolParticipantRepository,
+            PoolParticipantMapper poolParticipantMapper,
             PoolCacheService poolCacheService,
             MegaSenaCalculator megaSenaCalculator
     ){
         this.poolRepository = poolRepository;
         this.poolMapper = poolMapper;
-        this.organizerRepository = organizerRepository;
+        this.userRepository = userRepository;
         this.poolParticipantRepository = poolParticipantRepository;
-        this.poolCacheService = poolCacheService;
+//        this.poolCacheService = poolCacheService;
+        this.poolParticipantMapper = poolParticipantMapper;
         this.megaSenaCalculator = megaSenaCalculator;
     }
 
+    @Transactional
     public PoolResponseDTO createPool(PoolRequestDTO dto){
-        Organizer organizer = organizerRepository.findById(dto.organizerId())
-                .orElseThrow(()-> new EntityNotFoundException("Organizer not found"));
-
-        Pool pool = poolMapper.toEntity(dto, organizer);
+        //check if user exists
+        User user = userRepository.findById(dto.userId())
+                .orElseThrow(()-> new EntityNotFoundException(ErrorMessages.USER_NOT_FOUND));
+        //give organizer role
+        if(!user.getRoles().contains(Role.ORGANIZER)){
+            user.getRoles().add(Role.ORGANIZER);
+            userRepository.save(user);
+        }
+        Pool pool = poolMapper.toEntity(dto, user);
         poolRepository.save(pool);
+
+        //optional participation of pools creator
+        boolean includeCreator = Boolean.TRUE.equals(dto.includeCreatorAsParticipant());
+        if(includeCreator){
+            String nickname = dto.creatorParticipation().nickname();
+            BigDecimal maxValue = dto.creatorParticipation().maxValueToBet();
+
+            if(!poolParticipantRepository.existsByPoolIdAndPlayerId(pool.getId(), user.getId())){
+                PoolParticipant participant =
+                        poolParticipantMapper.toEntity(
+                            new PoolParticipantRequestDTO(
+                                    nickname,
+                                    maxValue,
+                                    user.getId(),
+                                    dto.keyword()),
+                                    user,
+                                    pool
+                        );
+                participant.setJoinedAt(LocalDateTime.now());
+                poolParticipantRepository.save(participant);
+            }
+        }
 
         return poolMapper.toResponse(pool);
     }
@@ -66,16 +99,15 @@ public class PoolService {
 
     public BigDecimal calculateTotalAmount(UUID poolId){
         //calc total amount
-        BigDecimal totalAmount = poolParticipantRepository.findAllByPoolId(poolId)
+
+        //cache totalAmount
+        //poolCacheService.cachePoolStats(poolId, totalAmount);
+
+        return poolParticipantRepository.findAllByPoolId(poolId)
                 .stream()
                 .map(PoolParticipant::getMaxValueToBet)
                 .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        //cache totalAmount
-        poolCacheService.cachePoolStats(poolId, totalAmount);
-
-        return totalAmount;
     }
 
     public BigDecimal getCachedTotalAmount(UUID poolId){

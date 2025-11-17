@@ -16,7 +16,7 @@ import java.util.UUID;
 @Setter
 @Entity(name = "pool_participant")
 @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"player_id", "pool_id"}),
+        @UniqueConstraint(columnNames = {"user_id", "pool_id"}),
         @UniqueConstraint(columnNames = {"nickname", "pool_id"})
 })
 public class PoolParticipant {
@@ -27,8 +27,8 @@ public class PoolParticipant {
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "player_id", nullable = false)
-    private Player player;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User player;
 
     @NotNull
     @ManyToOne

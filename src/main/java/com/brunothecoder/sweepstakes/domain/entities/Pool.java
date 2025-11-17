@@ -27,6 +27,11 @@ public class Pool {
     @Column(nullable = false, length = 100)
     private String name;
 
+    @NotBlank
+    @Size(max = 100)
+    @Column(nullable = false, length = 100)
+    private String keyword;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -56,8 +61,8 @@ public class Pool {
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "organizer_id", nullable = false)
-    private Organizer organizer;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User organizer;
 
     @Column(nullable = false)
     boolean finalized;

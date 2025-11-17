@@ -8,4 +8,5 @@ import java.util.UUID;
 
 public interface PoolParticipantRepository extends JpaRepository<PoolParticipant, UUID> {
     List<PoolParticipant> findAllByPoolId(UUID poolId);
+    Boolean existsByPoolIdAndPlayerId(UUID poolId, UUID userId);
 }

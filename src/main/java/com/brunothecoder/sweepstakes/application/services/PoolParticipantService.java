@@ -2,16 +2,12 @@ package com.brunothecoder.sweepstakes.application.services;
 
 import com.brunothecoder.sweepstakes.api.dto.pool_participant.PoolParticipantRequestDTO;
 import com.brunothecoder.sweepstakes.api.dto.pool_participant.PoolParticipantResponseDTO;
+import com.brunothecoder.sweepstakes.api.exceptions.ErrorMessages;
 import com.brunothecoder.sweepstakes.api.mappers.PoolParticipantMapper;
-import com.brunothecoder.sweepstakes.domain.entities.Organizer;
-import com.brunothecoder.sweepstakes.domain.entities.Player;
-import com.brunothecoder.sweepstakes.domain.entities.Pool;
-import com.brunothecoder.sweepstakes.domain.entities.PoolParticipant;
-import com.brunothecoder.sweepstakes.domain.repositories.OrganizerRepository;
-import com.brunothecoder.sweepstakes.domain.repositories.PlayerRepository;
-import com.brunothecoder.sweepstakes.domain.repositories.PoolParticipantRepository;
-import com.brunothecoder.sweepstakes.domain.repositories.PoolRepository;
+import com.brunothecoder.sweepstakes.domain.entities.*;
+import com.brunothecoder.sweepstakes.domain.repositories.*;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -23,53 +19,61 @@ import java.util.UUID;
 public class PoolParticipantService {
 
     private final PoolParticipantRepository poolParticipantRepository;
-    private final PlayerRepository playerRepository;
+    private final UserRepository userRepository;
     private final PoolRepository poolRepository;
-    private final OrganizerRepository organizerRepository;
     private final PoolParticipantMapper poolParticipantMapper;
     private final PoolService poolService;
 
     public PoolParticipantService(
             PoolParticipantRepository poolParticipantRepository,
-            PlayerRepository playerRepository,
+            UserRepository userRepository,
             PoolRepository poolRepository,
-            OrganizerRepository organizerRepository,
             PoolParticipantMapper poolParticipantMapper,
             PoolService poolService
 
     ){
         this.poolParticipantRepository = poolParticipantRepository;
-        this.playerRepository = playerRepository;
+        this.userRepository = userRepository;
         this.poolRepository = poolRepository;
-        this.organizerRepository = organizerRepository;
         this.poolParticipantMapper = poolParticipantMapper;
         this.poolService = poolService;
     }
 
+    @Transactional
     public PoolParticipantResponseDTO joinPool(
             UUID poolId,
             PoolParticipantRequestDTO poolParticipantRequestDTO){
 
-        //check if organizer exists
-        Organizer organizer = organizerRepository.findById(poolParticipantRequestDTO.organizerId())
-                .orElseThrow(()-> new EntityNotFoundException("Organizer not found!"));
-        //check if informed keyword matches organizer keyword
-        if(!organizer.getKeyword().equals(poolParticipantRequestDTO.keyword())){
-            throw new IllegalArgumentException("Invalid keyword for this organizer.");
-        }
         //check if pool exists
         Pool pool = poolRepository.findById(poolId)
-                .orElseThrow(()-> new EntityNotFoundException("Pool not found!"));
-        //check if player exists
-        Player player = playerRepository.findById(poolParticipantRequestDTO.playerId())
-                .orElseThrow(()-> new EntityNotFoundException("Player not found!"));
+                .orElseThrow(()-> new EntityNotFoundException((ErrorMessages.POOL_NOT_FOUND)));
+
+        //check if informed keyword matches pool keyword
+        if(!pool.getKeyword().equals(poolParticipantRequestDTO.keyword())){
+            throw new IllegalArgumentException(ErrorMessages.POOL_KEYWORD_INVALID);
+        }
+
+        //check if user_maxValueToBet is within Pool range
+        BigDecimal poolMin = pool.getMinValuePerShare();
+        BigDecimal poolMax = pool.getMaxValuePerShare();
+        BigDecimal userMaxValueToBet = poolParticipantRequestDTO.maxValueToBet();
+        if(userMaxValueToBet.compareTo(poolMin) < 0){
+            throw new IllegalArgumentException((ErrorMessages.BELOW_POOL_MIN));
+        }
+        if(userMaxValueToBet.compareTo(poolMax) > 0){
+            throw new IllegalArgumentException(ErrorMessages.ABOVE_POOL_MAX);
+        }
+
+        //check if player exists and is validated
+        User player = userRepository.findById(poolParticipantRequestDTO.userId())
+                .orElseThrow(()-> new EntityNotFoundException(ErrorMessages.USER_NOT_FOUND));
 
         PoolParticipant poolParticipant = poolParticipantMapper.toEntity(poolParticipantRequestDTO, player, pool);
         poolParticipant.setJoinedAt(LocalDateTime.now());
         poolParticipantRepository.save(poolParticipant);
 
         //update cache with totalAmount
-        BigDecimal updatedTotal = poolService.calculateTotalAmount(poolId);
+//        BigDecimal updatedTotal = poolService.calculateTotalAmount(poolId);
         return poolParticipantMapper.toResponse(poolParticipant);
     }
 

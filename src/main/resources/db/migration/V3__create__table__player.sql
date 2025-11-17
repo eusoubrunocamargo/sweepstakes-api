@@ -1,6 +1,0 @@
-CREATE TABLE player (
-    id BINARY(16) PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    whatsapp VARCHAR(20) NOT NULL,
-    validated_user BOOLEAN NOT NULL DEFAULT FALSE
-) ENGINE=InnoDB;

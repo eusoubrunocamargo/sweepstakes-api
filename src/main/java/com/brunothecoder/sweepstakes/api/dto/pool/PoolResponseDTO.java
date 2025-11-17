@@ -10,6 +10,7 @@ import java.util.UUID;
 public record PoolResponseDTO(
    UUID id,
    String name,
+   String keyword,
    LotteryType lotteryType,
    LocalDateTime endDate,
    LocalDateTime drawDate,
