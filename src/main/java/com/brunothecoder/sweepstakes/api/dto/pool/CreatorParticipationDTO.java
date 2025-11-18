@@ -10,5 +10,7 @@ public record CreatorParticipationDTO(
     String nickname,
 
     @DecimalMin(value = "5.00", inclusive = true)
-    BigDecimal maxValueToBet
+    BigDecimal maxValueToBet,
+
+    String option
 ){}

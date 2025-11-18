@@ -6,12 +6,12 @@ import jakarta.validation.constraints.Size;
 
 public record UserRequestDTO(
         @NotBlank
-        @Size(max = 100)
+        @Size(max = 100, message = "Name must be 100 char max.")
         String name,
 
         @NotBlank
         @Size(max = 20)
-        @Pattern(regexp = "^\\+55\\d{11}$")
+        @Pattern(regexp = "^\\+55\\d{11}$", message = "Número deve ter 11 dígitos.")
         String whatsapp
 ) {
 }
