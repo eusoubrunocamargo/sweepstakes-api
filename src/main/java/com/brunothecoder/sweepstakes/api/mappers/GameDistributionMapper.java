@@ -8,6 +8,7 @@ import com.brunothecoder.sweepstakes.domain.entities.Pool;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 @Component
@@ -15,9 +16,22 @@ public class GameDistributionMapper {
 
     public static GameDistributionResponseDTO toResponse(
             Pool pool,
-            GameDistributionResult result
+            GameDistributionResult result,
+            BigDecimal grossAmountCollected,
+            BigDecimal netAmountForBetting
     ){
-        List<GameDetailDTO> details = result
+
+        //calc final value
+        BigDecimal platformFee = grossAmountCollected.subtract(netAmountForBetting)
+                .setScale(2, RoundingMode.HALF_EVEN);
+
+        BigDecimal amountSpentOnGames = result.totalSpent();
+
+        BigDecimal netBalanceRemaining = netAmountForBetting.subtract(amountSpentOnGames)
+                .setScale(2, RoundingMode.HALF_EVEN);
+
+        //mapping
+        List<GameDetailDTO> distribution = result
                 .distribution()
                 .entrySet()
                 .stream()
@@ -33,10 +47,12 @@ public class GameDistributionMapper {
 
         return new GameDistributionResponseDTO(
                 pool.getName(),
-                result.totalAmount(),
-                result.totalSpent(),
-                result.remaining(),
-                details
+                grossAmountCollected,
+                platformFee,
+                netAmountForBetting,
+                amountSpentOnGames,
+                netBalanceRemaining,
+                distribution
         );
     }
 }

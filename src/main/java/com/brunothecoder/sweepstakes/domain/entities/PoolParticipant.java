@@ -14,8 +14,8 @@ import java.util.UUID;
 @EqualsAndHashCode(of = "id")
 @Getter
 @Setter
-@Entity(name = "pool_participant")
-@Table(uniqueConstraints = {
+@Entity
+@Table(name ="pool_participant", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"user_id", "pool_id"}),
         @UniqueConstraint(columnNames = {"nickname", "pool_id"})
 })
@@ -47,5 +47,9 @@ public class PoolParticipant {
     @NotNull
     @Column(nullable = false)
     private LocalDateTime joinedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private ParticipantStatus status = ParticipantStatus.PENDING;
 
 }

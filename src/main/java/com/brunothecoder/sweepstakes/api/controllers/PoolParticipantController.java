@@ -37,4 +37,11 @@ public class PoolParticipantController {
        List<PoolParticipantResponseDTO> participants = poolParticipantService.listParticipantsByPool(poolId);
        return ResponseEntity.ok(participants);
    }
+
+   @PatchMapping("/{participantId}/confirm")
+    public ResponseEntity<Void>
+   confirmeParticipantPayment(@PathVariable UUID participantId){
+       poolParticipantService.confirmParticipantPayment(participantId);
+       return ResponseEntity.ok().build();
+   }
 }

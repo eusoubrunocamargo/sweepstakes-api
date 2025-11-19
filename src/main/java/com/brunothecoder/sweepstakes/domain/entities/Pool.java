@@ -15,7 +15,8 @@ import java.util.UUID;
 @EqualsAndHashCode(of = "id")
 @Getter
 @Setter
-@Entity(name = "pool")
+@Entity
+@Table(name = "pool")
 public class Pool {
 
     @Id
@@ -70,5 +71,13 @@ public class Pool {
     @NotNull
     @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "admin_fee_percentage", precision = 5, scale = 4)
+    @Builder.Default
+    private BigDecimal adminFeePercentage = new BigDecimal("0.05");
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private PoolStatus status = PoolStatus.OPEN;
 
 }

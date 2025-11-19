@@ -36,6 +36,8 @@ public class PoolService {
 //    private final PoolCacheService poolCacheService;
     private final MegaSenaCalculator megaSenaCalculator;
     private final PoolParticipantMapper poolParticipantMapper;
+    private final FinancialService financialService;
+    private final BigDecimal PLATFORM_FEE = BigDecimal.valueOf(0.05);
 
     public PoolService(
             PoolRepository poolRepository,
@@ -44,7 +46,8 @@ public class PoolService {
             PoolParticipantRepository poolParticipantRepository,
             PoolParticipantMapper poolParticipantMapper,
             PoolCacheService poolCacheService,
-            MegaSenaCalculator megaSenaCalculator
+            MegaSenaCalculator megaSenaCalculator,
+            FinancialService financialService
     ){
         this.poolRepository = poolRepository;
         this.poolMapper = poolMapper;
@@ -53,6 +56,7 @@ public class PoolService {
 //        this.poolCacheService = poolCacheService;
         this.poolParticipantMapper = poolParticipantMapper;
         this.megaSenaCalculator = megaSenaCalculator;
+        this.financialService = financialService;
     }
 
     @Transactional
@@ -103,11 +107,13 @@ public class PoolService {
         //cache totalAmount
         //poolCacheService.cachePoolStats(poolId, totalAmount);
 
-        return poolParticipantRepository.findAllByPoolId(poolId)
-                .stream()
-                .map(PoolParticipant::getMaxValueToBet)
-                .filter(Objects::nonNull)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+//        return poolParticipantRepository.findAllByPoolId(poolId)
+//                .stream()
+//                .map(PoolParticipant::getMaxValueToBet)
+//                .filter(Objects::nonNull)
+//                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal total = poolParticipantRepository.getConfirmedTotalAmount(poolId);
+        return Objects.requireNonNullElse(total, BigDecimal.ZERO);
     }
 
     public BigDecimal getCachedTotalAmount(UUID poolId){
@@ -115,9 +121,24 @@ public class PoolService {
     }
 
     public GameDistributionResponseDTO calculateGameDistribution(UUID poolId){
+
         Pool pool = poolRepository.findById(poolId).orElseThrow(()-> new EntityNotFoundException("Pool not found!"));
-        GameDistributionResult result = megaSenaCalculator.calculate(calculateTotalAmount(poolId));
-        return GameDistributionMapper.toResponse(pool, result);
+
+        //Gross amount from confirmed participants
+        BigDecimal confirmedGrossAmount = poolParticipantRepository.getConfirmedTotalAmount(poolId);
+        if(confirmedGrossAmount == null) confirmedGrossAmount = BigDecimal.ZERO;
+
+        //Apply platform tax
+        BigDecimal netAmountForBetting = financialService.calculateNetAmountForBetting
+                (confirmedGrossAmount, pool.getAdminFeePercentage());
+
+//        GameDistributionResult result = megaSenaCalculator.calculate(calculateTotalAmount(poolId));
+        GameDistributionResult result = megaSenaCalculator.calculate(netAmountForBetting);
+        return GameDistributionMapper.toResponse(
+                pool,
+                result,
+                confirmedGrossAmount,
+                netAmountForBetting);
     }
 
 }

@@ -83,4 +83,17 @@ public class PoolParticipantService {
                 .map(poolParticipantMapper::toResponse)
                 .toList();
     }
+
+    @Transactional
+    public void confirmParticipantPayment(UUID participantId){
+
+        PoolParticipant participant = poolParticipantRepository.findById(participantId)
+                .orElseThrow(()-> new EntityNotFoundException("Pool Participant not found."));
+
+        if(participant.getStatus() != ParticipantStatus.CONFIRMED){
+            participant.setStatus(ParticipantStatus.CONFIRMED);
+        }
+
+        poolParticipantRepository.save(participant);
+    }
 }
