@@ -4,6 +4,7 @@ import com.brunothecoder.sweepstakes.api.dto.pool.PoolRequestDTO;
 import com.brunothecoder.sweepstakes.api.dto.pool.PoolResponseDTO;
 //import com.brunothecoder.sweepstakes.domain.entities.Organizer;
 import com.brunothecoder.sweepstakes.domain.entities.Pool;
+import com.brunothecoder.sweepstakes.domain.entities.PoolStatus;
 import com.brunothecoder.sweepstakes.domain.entities.User;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +25,9 @@ public class PoolMapper {
                 .organizer(organizer)
                 .finalized(false)
                 .createdAt(LocalDateTime.now())
+                .status(PoolStatus.OPEN)
                 .build();
+
     }
 
     public PoolResponseDTO toResponse (Pool pool){

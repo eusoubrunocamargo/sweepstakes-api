@@ -1,5 +1,6 @@
 package com.brunothecoder.sweepstakes.api.dto.pool;
 
+import com.brunothecoder.sweepstakes.domain.entities.ParticipantStatus;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Size;
 
@@ -10,7 +11,9 @@ public record CreatorParticipationDTO(
     String nickname,
 
     @DecimalMin(value = "5.00", inclusive = true)
-    BigDecimal maxValueToBet,
+    BigDecimal maxValueToBet
 
-    String option
+//    String option,
+//
+//    ParticipantStatus status
 ){}

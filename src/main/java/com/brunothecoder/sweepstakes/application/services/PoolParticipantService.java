@@ -70,6 +70,7 @@ public class PoolParticipantService {
 
         PoolParticipant poolParticipant = poolParticipantMapper.toEntity(poolParticipantRequestDTO, player, pool);
         poolParticipant.setJoinedAt(LocalDateTime.now());
+        poolParticipant.setStatus(ParticipantStatus.PENDING);
         poolParticipantRepository.save(poolParticipant);
 
         //update cache with totalAmount

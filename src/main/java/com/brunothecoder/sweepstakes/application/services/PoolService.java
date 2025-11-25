@@ -77,6 +77,7 @@ public class PoolService {
         if(includeCreator){
             String nickname = dto.creatorParticipation().nickname();
             BigDecimal maxValue = dto.creatorParticipation().maxValueToBet();
+//            ParticipantStatus status = dto.creatorParticipation().status();
 
             if(!poolParticipantRepository.existsByPoolIdAndPlayerId(pool.getId(), user.getId())){
                 PoolParticipant participant =
@@ -90,6 +91,7 @@ public class PoolService {
                                     pool
                         );
                 participant.setJoinedAt(LocalDateTime.now());
+                participant.setStatus(ParticipantStatus.PENDING);
                 poolParticipantRepository.save(participant);
             }
         }

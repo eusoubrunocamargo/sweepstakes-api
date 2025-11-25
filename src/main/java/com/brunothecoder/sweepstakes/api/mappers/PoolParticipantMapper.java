@@ -30,6 +30,7 @@ public class PoolParticipantMapper {
                 poolParticipant.getPool().getId(),
                 poolParticipant.getNickname(),
                 poolParticipant.getMaxValueToBet(),
+                poolParticipant.getStatus(),
                 poolParticipant.getJoinedAt()
         );
     }

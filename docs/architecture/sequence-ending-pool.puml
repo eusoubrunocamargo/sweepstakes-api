@@ -1,0 +1,31 @@
+
+@startuml
+title Fluxo: Entrada → Pagamento → Fechamento → Extrato
+
+actor Usuario
+participant "API Controller" as API
+participant "PoolService" as S
+database "Banco de Dados" as DB
+participant "Job Fechamento" as JOB
+participant "Organizador" as ORG
+
+== Entrada na Pool ==
+Usuario -> API: POST /api/pools/{id}/participants\n(nickname, valor)
+API -> S: criar participante (status = PENDING_PAYMENT)
+S -> DB: INSERT participante (status PENDING_PAYMENT)
+API --> Usuario: resposta (aguardando pagamento)
+
+== Pagamento PIX ==
+Usuario -> API: POST /api/payments\n(PIX)
+API -> S: confirmar pagamento
+S -> DB: UPDATE participante (status = CONFIRMED)
+API --> Usuario: pagamento confirmado
+
+== Fechamento da Pool ==
+JOB -> DB: SELECT participantes
+JOB -> DB: UPDATE status para CANCELED\nonde não pagou
+JOB -> S: calcular percentuais\n(base amountSpentOnGames)
+JOB -> S: gerar extrato JSON\n(confirmed + canceled, distribuição, sobras)
+S --> ORG: enviar extrato final
+
+@enduml
