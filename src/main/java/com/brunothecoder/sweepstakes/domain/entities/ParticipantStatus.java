@@ -4,5 +4,6 @@ public enum ParticipantStatus {
     PENDING,
     CONFIRMED,
     EXPIRED,
-    REFUNDED
+    REFUNDED,
+    CANCELED
 }

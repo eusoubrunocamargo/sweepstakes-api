@@ -1,0 +1,1 @@
+CREATE INDEX idx_generic_pool_name_status ON generic_pool(name, status);

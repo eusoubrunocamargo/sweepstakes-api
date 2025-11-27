@@ -14,6 +14,8 @@ public class ErrorMessages {
     public static final String POOL_DEADLINE_PASSED = "This pool is no longer accepting participants!";
     public static final String POOL_CAPACITY_EXCEEDED = "Pool has reached its maximum number of participants!";
     public static final String POOL_KEYWORD_INVALID = "Invalid keyword for this pool!";
+    public static final String POOL_ALREADY_EXISTS = "Já existe um bolão ativo com este nome!";
+    public static final String MAX_ACTIVE_POOLS = "Máximo de 5 bolões ativos!";
 
     // === User / Participant ===
     public static final String USER_NOT_FOUND = "User not found!";

@@ -14,10 +14,10 @@ import java.util.UUID;
 @EqualsAndHashCode(of = "id")
 @Getter
 @Setter
-@Entity(name = "generic_participant")
+@Entity
 @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"user_id", "pool_generic_id"})
-})
+        @UniqueConstraint(columnNames = {"user_id", "generic_pool_id"})
+}, name = "generic_participant")
 public class GenericPoolParticipant {
 
     @Id
@@ -31,7 +31,7 @@ public class GenericPoolParticipant {
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "pool_generic_id", nullable = false)
+    @JoinColumn(name = "generic_pool_id", nullable = false)
     private GenericPool genericPool;
 
     @NotNull
@@ -46,5 +46,9 @@ public class GenericPoolParticipant {
     @NotNull
     @Column(nullable = false)
     private LocalDateTime joinedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private ParticipantStatus status = ParticipantStatus.PENDING;
 
 }

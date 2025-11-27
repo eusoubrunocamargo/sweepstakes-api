@@ -5,10 +5,7 @@ import com.brunothecoder.sweepstakes.api.dto.genericpool_participant.GenericPart
 import com.brunothecoder.sweepstakes.api.dto.pool_generic.GenericPoolRequestDTO;
 import com.brunothecoder.sweepstakes.api.exceptions.ErrorMessages;
 import com.brunothecoder.sweepstakes.api.mappers.GenericParticipantMapper;
-import com.brunothecoder.sweepstakes.domain.entities.GenericOption;
-import com.brunothecoder.sweepstakes.domain.entities.GenericPool;
-import com.brunothecoder.sweepstakes.domain.entities.GenericPoolParticipant;
-import com.brunothecoder.sweepstakes.domain.entities.User;
+import com.brunothecoder.sweepstakes.domain.entities.*;
 import com.brunothecoder.sweepstakes.domain.repositories.GenericOptionRepository;
 import com.brunothecoder.sweepstakes.domain.repositories.GenericPoolParticipantRepository;
 import com.brunothecoder.sweepstakes.domain.repositories.GenericPoolRepository;
@@ -65,6 +62,7 @@ public class GenericPoolParticipantService {
         GenericPoolParticipant participant = genericParticipantMapper.toEntity(
                 dto, user, genericPool, option
         );
+        participant.setStatus(ParticipantStatus.PENDING);
         genericPoolParticipantRepository.save(participant);
 
         return genericParticipantMapper.toResponse(participant);

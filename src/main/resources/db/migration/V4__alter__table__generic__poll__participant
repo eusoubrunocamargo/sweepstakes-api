@@ -1,0 +1,16 @@
+--ALTER TABLE generic_participant
+--ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'PENDING';
+--
+--ALTER TABLE generic_participant
+--ADD CONSTRAINT chk_generic_participant_status
+--CHECK (status IN('PENDING', 'CONFIRMED', 'EXPIRED', 'REFUNDED', 'CANCELED'));
+
+--ALTER TABLE pool_generic
+--ADD COLUMN admin_fee_percentage NUMERIC(5,4) NOT NULL DEFAULT 0.05;
+--
+--ALTER TABLE pool_generic
+--ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'OPEN';
+--
+--ALTER TABLE pool_generic
+--ADD CONSTRAINT chk_pool_status
+--CHECK (status IN ('OPEN', 'WAITING_PAYMENTS', 'FINALIZED', 'CANCELED'));

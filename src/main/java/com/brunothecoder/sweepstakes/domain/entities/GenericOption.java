@@ -15,7 +15,8 @@ import java.util.UUID;
 @EqualsAndHashCode(of = "id")
 @Getter
 @Setter
-@Entity(name = "generic_option")
+@Entity
+@Table(name = "generic_option")
 public class GenericOption {
 
     @Id
@@ -35,8 +36,8 @@ public class GenericOption {
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "pool_generic_id", nullable = false)
-    private GenericPool poolGeneric;
+    @JoinColumn(name = "generic_pool_id", nullable = false)
+    private GenericPool genericPool;
 
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

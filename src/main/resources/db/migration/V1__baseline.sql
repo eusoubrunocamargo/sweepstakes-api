@@ -27,11 +27,12 @@ CREATE TABLE pool (
     max_value_per_share DECIMAL(10,2),
     user_id BINARY(16),
     finalized BOOLEAN DEFAULT FALSE,
+    admin_fee_percentage NUMERIC(5,4) NOT NULL DEFAULT 0.05,
+    status VARCHAR(20) NOT NULL DEFAULT 'OPEN',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    CONSTRAINT chk_pool_lottery_type CHECK (
-        lottery_type IN ('MEGASENA', 'QUINA')
-    )
+    CONSTRAINT chk_pool_status CHECK (status IN ('OPEN', 'WAITING_PAYMENTS', 'FINALIZED', 'CANCELED')),
+    CONSTRAINT chk_pool_lottery_type CHECK (lottery_type IN ('MEGASENA', 'QUINA', 'LIVRE')),
+    FOREIGN KEY (user_id) REFERENCES users(id)
 ) ENGINE=InnoDB;
 
 CREATE TABLE pool_participant (
@@ -40,14 +41,16 @@ CREATE TABLE pool_participant (
     pool_id BINARY(16) NOT NULL,
     nickname VARCHAR(50) NOT NULL,
     max_value_to_bet DECIMAL(10,2),
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
     joined_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_participant_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_participant_pool FOREIGN KEY (pool_id) REFERENCES pool(id) ON DELETE CASCADE,
     CONSTRAINT uq_user_pool UNIQUE (user_id, pool_id),
-    CONSTRAINT uq_nickname_pool UNIQUE (nickname, pool_id)
+    CONSTRAINT uq_nickname_pool UNIQUE (nickname, pool_id),
+    CONSTRAINT chk_participant_status CHECK (status IN('PENDING', 'CONFIRMED', 'EXPIRED', 'REFUNDED'))
 ) ENGINE=InnoDB;
 
-CREATE TABLE pool_generic (
+CREATE TABLE generic_pool (
     id BINARY(16) PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     keyword VARCHAR(50) NOT NULL,
@@ -58,30 +61,35 @@ CREATE TABLE pool_generic (
     user_id BINARY(16) NOT NULL,
     finalized BOOLEAN DEFAULT FALSE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    admin_fee_percentage NUMERIC(5,4) NOT NULL DEFAULT 0.05,
+    status VARCHAR(20) NOT NULL DEFAULT 'OPEN',
+    CONSTRAINT chk_generic_pool_status CHECK (status IN ('OPEN', 'WAITING_PAYMENTS', 'FINALIZED', 'CANCELED')),
     CONSTRAINT fk_pool_generic_user FOREIGN KEY (user_id) REFERENCES users(id)
 ) ENGINE=InnoDB;
 
 CREATE TABLE generic_option (
     id BINARY(16) PRIMARY KEY,
-    pool_generic_id BINARY(16) NOT NULL,
+    generic_pool_id BINARY(16) NOT NULL,
     label VARCHAR(100) NOT NULL,
     creator_choice TINYINT(1) NULL DEFAULT NULL,
     sort_order INT DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_generic_option_pool FOREIGN KEY (pool_generic_id) REFERENCES pool_generic(id) ON DELETE CASCADE,
-    UNIQUE(pool_generic_id, label),
-    UNIQUE(pool_generic_id, creator_choice)
+    CONSTRAINT fk_generic_option_pool FOREIGN KEY (generic_pool_id) REFERENCES generic_pool(id) ON DELETE CASCADE,
+    UNIQUE(generic_pool_id, label),
+    UNIQUE(generic_pool_id, creator_choice)
 ) ENGINE=InnoDB;
 
 CREATE TABLE generic_participant (
     id BINARY(16) PRIMARY KEY,
     user_id BINARY(16) NOT NULL,
-    pool_generic_id BINARY(16) NOT NULL,
+    generic_pool_id BINARY(16) NOT NULL,
     chosen_option_id BINARY(16) NOT NULL,
     nickname VARCHAR(50) NOT NULL,
     joined_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    CONSTRAINT chk_generic_participant_status CHECK (status IN('PENDING', 'CONFIRMED', 'EXPIRED', 'REFUNDED', 'CANCELED')),
     CONSTRAINT fk_generic_participant_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    CONSTRAINT fk_generic_participant_pool FOREIGN KEY (pool_generic_id) REFERENCES pool_generic(id) ON DELETE CASCADE,
+    CONSTRAINT fk_generic_participant_pool FOREIGN KEY (generic_pool_id) REFERENCES generic_pool(id) ON DELETE CASCADE,
     CONSTRAINT fk_generic_participant_option FOREIGN KEY (chosen_option_id) REFERENCES generic_option(id) ON DELETE CASCADE,
-    UNIQUE(user_id, pool_generic_id, chosen_option_id)
+    UNIQUE(user_id, generic_pool_id, chosen_option_id)
 ) ENGINE=InnoDB;

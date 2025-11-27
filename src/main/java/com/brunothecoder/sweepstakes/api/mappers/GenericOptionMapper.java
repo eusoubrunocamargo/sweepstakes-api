@@ -15,7 +15,7 @@ public class GenericOptionMapper {
                 .label(dto.label())
                 .creatorChoice(dto.isCreatorChoice())
                 .sortOrder(dto.sortOrder() != null ? dto.sortOrder() : 0)
-                .poolGeneric(genericPool)
+                .genericPool(genericPool)
                 .createdAt(LocalDateTime.now())
                 .build();
     }

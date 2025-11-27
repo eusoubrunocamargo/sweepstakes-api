@@ -35,7 +35,8 @@ public class GenericParticipantMapper {
                 participant.getPlayer().getId(),
                 participant.getGenericPool().getId(),
                 participant.getChosenOption().getId(),
-                participant.getJoinedAt()
+                participant.getJoinedAt(),
+                participant.getStatus()
         );
     }
 }

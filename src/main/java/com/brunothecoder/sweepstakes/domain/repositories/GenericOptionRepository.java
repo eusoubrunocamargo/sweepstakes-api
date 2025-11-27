@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface GenericOptionRepository extends JpaRepository<GenericOption, UUID> {
-    List<GenericOption> findAllByPoolGenericId(UUID id);
+    List<GenericOption> findByGenericPool_Id(UUID poolId);
 }

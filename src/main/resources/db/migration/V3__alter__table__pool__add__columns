@@ -1,0 +1,10 @@
+--ALTER TABLE pool
+--ADD COLUMN admin_fee_percentage NUMERIC(5,4) NOT NULL DEFAULT 0.05;
+--
+--ALTER TABLE pool
+--ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'OPEN';
+--
+--ALTER TABLE pool
+--ADD CONSTRAINT chk_pool_status
+--CHECK (status IN ('OPEN', 'WAITING_PAYMENTS', 'FINALIZED', 'CANCELED'));
+

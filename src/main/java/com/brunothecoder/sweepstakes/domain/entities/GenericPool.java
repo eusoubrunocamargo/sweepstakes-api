@@ -16,7 +16,8 @@ import java.util.UUID;
 @EqualsAndHashCode(of = "id")
 @Getter
 @Setter
-@Entity(name = "pool_generic")
+@Entity
+@Table(name = "generic_pool")
 public class GenericPool {
 
     @Id
@@ -53,6 +54,14 @@ public class GenericPool {
     @Column(nullable = false)
     private LocalDateTime drawDate;
 
+    @Column(name = "admin_fee_percentage", precision = 5, scale = 4)
+    @Builder.Default
+    private BigDecimal adminFeePercentage = new BigDecimal("0.05");
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private PoolStatus status = PoolStatus.OPEN;
+
     @NotNull
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -65,6 +74,6 @@ public class GenericPool {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "poolGeneric", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "genericPool", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GenericOption> options;
 }
