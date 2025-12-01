@@ -1,4 +1,7 @@
 package com.brunothecoder.sweepstakes.domain.entities;
 
-public class Organizer {
+public enum Role {
+    ORGANIZER,
+    PLAYER,
+    ADMIN
 }
