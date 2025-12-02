@@ -3,6 +3,8 @@ package com.brunothecoder.sweepstakes.api.exceptions;
 public class ErrorMessages {
 
 
+    public static final String USER_INVALID_NAME = "Nome inválido. Deve conter nome e sobrenome completos. Exemplo: João Silva" ;
+    public static final String USER_INVALID_WHATSAPP = "Whatsapp inválido. Formato esperado: +55 seguido de DDD e número. Exemplo: +5561992340000";
 
     private ErrorMessages() {}
 
