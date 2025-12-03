@@ -61,40 +61,22 @@ public class PoolService {
 
     @Transactional
     public PoolResponseDTO createPool(PoolRequestDTO dto){
+
         //check if user exists
         User user = userRepository.findById(dto.userId())
                 .orElseThrow(()-> new EntityNotFoundException(ErrorMessages.USER_NOT_FOUND));
+
         //give organizer role
-        if(!user.getRoles().contains(Role.ORGANIZER)){
-            user.getRoles().add(Role.ORGANIZER);
+        if(user.promoteToOrganizer()){
             userRepository.save(user);
         }
+
+        //save pool
         Pool pool = poolMapper.toEntity(dto, user);
         poolRepository.save(pool);
 
         //optional participation of pools creator
-        boolean includeCreator = Boolean.TRUE.equals(dto.includeCreatorAsParticipant());
-        if(includeCreator){
-            String nickname = dto.creatorParticipation().nickname();
-            BigDecimal maxValue = dto.creatorParticipation().maxValueToBet();
-//            ParticipantStatus status = dto.creatorParticipation().status();
-
-            if(!poolParticipantRepository.existsByPoolIdAndPlayerId(pool.getId(), user.getId())){
-                PoolParticipant participant =
-                        poolParticipantMapper.toEntity(
-                            new PoolParticipantRequestDTO(
-                                    nickname,
-                                    maxValue,
-                                    user.getId(),
-                                    dto.keyword()),
-                                    user,
-                                    pool
-                        );
-                participant.setJoinedAt(LocalDateTime.now());
-                participant.setStatus(ParticipantStatus.PENDING);
-                poolParticipantRepository.save(participant);
-            }
-        }
+        addCreatorAsParticipantIfRequested(dto, pool, user);
 
         return poolMapper.toResponse(pool);
     }
@@ -121,7 +103,6 @@ public class PoolService {
     public BigDecimal getCachedTotalAmount(UUID poolId){
         return calculateTotalAmount(poolId);
     }
-
     public GameDistributionResponseDTO calculateGameDistribution(UUID poolId){
 
         Pool pool = poolRepository.findById(poolId).orElseThrow(()-> new EntityNotFoundException("Pool not found!"));
@@ -141,6 +122,34 @@ public class PoolService {
                 result,
                 confirmedGrossAmount,
                 netAmountForBetting);
+    }
+
+    private void addCreatorAsParticipantIfRequested(
+            PoolRequestDTO dto,
+            Pool pool,
+            User user
+    ){
+        if(!Boolean.TRUE.equals(dto.includeCreatorAsParticipant())){
+            return;
+        }
+
+        if(poolParticipantRepository.existsByPoolIdAndPlayerId(pool.getId(), user.getId())){
+            return;
+        }
+
+        PoolParticipant participant = poolParticipantMapper.toEntity(
+                new PoolParticipantRequestDTO(
+                        dto.creatorParticipation().nickname(),
+                        dto.creatorParticipation().maxValueToBet(),
+                        user.getId(),
+                        dto.keyword()
+                ),user,pool
+        );
+
+        participant.setJoinedAt(LocalDateTime.now());
+        participant.setStatus(ParticipantStatus.PENDING);
+
+        poolParticipantRepository.save(participant);
     }
 
 }
