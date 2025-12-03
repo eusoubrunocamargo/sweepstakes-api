@@ -5,6 +5,10 @@ public class ErrorMessages {
 
     public static final String USER_INVALID_NAME = "Nome inválido. Deve conter nome e sobrenome completos. Exemplo: João Silva" ;
     public static final String USER_INVALID_WHATSAPP = "Whatsapp inválido. Formato esperado: +55 seguido de DDD e número. Exemplo: +5561992340000";
+    public static final String POOL_INVALID_DATES = "Data do sorteio deve ser após data de fechamento.";
+    public static final String POOL_INVALID_RANGE = "Valor máximo deve ser maior ou igual ao mínimo.";
+    public static final String INVALID_BET_VALUE = "Valor da aposta não pode ser nulo.";
+    public static final String POOL_IS_FINALIZED = "Este bolão já está finalizado.";
 
     private ErrorMessages() {}
 
