@@ -14,19 +14,35 @@ import java.time.LocalDateTime;
 public class PoolMapper {
 
     public Pool toEntity (PoolRequestDTO dto, User organizer){
-        return Pool.builder()
-                .name(dto.name())
-                .keyword(dto.keyword())
-                .lotteryType(dto.lotteryType())
-                .endDate(dto.endDate())
-                .drawDate(dto.drawDate())
-                .minValuePerShare(dto.minValuePerShare())
-                .maxValuePerShare(dto.maxValuePerShare())
-                .organizer(organizer)
-                .finalized(false)
-                .createdAt(LocalDateTime.now())
-                .status(PoolStatus.OPEN)
-                .build();
+
+        Pool pool = new Pool();
+
+        // from BasePool
+        pool.setName(dto.name());
+        pool.setKeyword(dto.keyword());
+        pool.setEndDate(dto.endDate());
+        pool.setDrawDate(dto.drawDate());
+        pool.setOrganizer(organizer);
+
+        // from Pool
+        pool.setLotteryType(dto.lotteryType());
+        pool.setMinValuePerShare(dto.minValuePerShare());
+        pool.setMaxValuePerShare(dto.maxValuePerShare());
+
+        return pool;
+//        return Pool.builder()
+//                .name(dto.name())
+//                .keyword(dto.keyword())
+//                .lotteryType(dto.lotteryType())
+//                .endDate(dto.endDate())
+//                .drawDate(dto.drawDate())
+//                .minValuePerShare(dto.minValuePerShare())
+//                .maxValuePerShare(dto.maxValuePerShare())
+//                .organizer(organizer)
+//                .finalized(false)
+//                .createdAt(LocalDateTime.now())
+//                .status(PoolStatus.OPEN)
+//                .build();
 
     }
 

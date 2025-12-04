@@ -5,11 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.cglib.core.Local;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -21,6 +17,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(of = "id")
 public abstract class BasePool {
 
     protected static final BigDecimal DEFAULT_ADMIN_FEE = new BigDecimal("0.05");
@@ -120,7 +117,7 @@ public abstract class BasePool {
         return isOpen() && !hasExpired();
     }
 
-    public void finalize() {
+    public void finalizePool() {
 
         if(this.finalized) {
             throw new IllegalArgumentException(ErrorMessages.POOL_IS_FINALIZED);

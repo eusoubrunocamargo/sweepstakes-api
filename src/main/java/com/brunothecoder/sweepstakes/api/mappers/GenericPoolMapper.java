@@ -17,17 +17,31 @@ public class GenericPoolMapper {
 
     public GenericPool toEntity(GenericPoolRequestDTO dto, User organizer){
 
-        return GenericPool.builder()
-                .name(dto.name())
-                .keyword(dto.keyword())
-                .description(dto.description())
-                .poolValue(dto.poolValue())
-                .endDate(dto.endDate())
-                .drawDate(dto.drawDate())
-                .organizer(organizer)
-                .finalized(false)
-                .createdAt(LocalDateTime.now())
-                .build();
+        GenericPool genericPool = new GenericPool();
+
+        // from BasePool
+        genericPool.setName(dto.name());
+        genericPool.setKeyword(dto.keyword());
+        genericPool.setEndDate(dto.endDate());
+        genericPool.setDrawDate(dto.drawDate());
+        genericPool.setOrganizer(organizer);
+
+        // from GenericPool
+        genericPool.setDescription(dto.description());
+        genericPool.setPoolValue(dto.poolValue());
+
+        return genericPool;
+//        return GenericPool.builder()
+//                .name(dto.name())
+//                .keyword(dto.keyword())
+//                .description(dto.description())
+//                .poolValue(dto.poolValue())
+//                .endDate(dto.endDate())
+//                .drawDate(dto.drawDate())
+//                .organizer(organizer)
+//                .finalized(false)
+//                .createdAt(LocalDateTime.now())
+//                .build();
     }
 
     public GenericPoolResponseDTO toResponse(GenericPool genericPool, List<GenericOption> options){
