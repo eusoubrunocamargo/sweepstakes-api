@@ -1,6 +1,7 @@
 package com.brunothecoder.sweepstakes.domain.entities;
 
 import com.brunothecoder.sweepstakes.api.exceptions.ErrorMessages;
+import io.lettuce.core.support.BasePool;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;

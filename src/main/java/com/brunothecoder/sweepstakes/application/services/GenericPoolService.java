@@ -56,61 +56,50 @@ public class GenericPoolService {
     @Transactional
     public GenericPoolResponseDTO create(GenericPoolRequestDTO dto){
 
-        //check user
+        // 1. check and validate user
         User user = userRepository.findById(dto.userId())
                 .orElseThrow(()-> new EntityNotFoundException(ErrorMessages.USER_NOT_FOUND));
 
-        //check options
+        // 2. check and validate options
         validateOptions(dto.options());
 
-        //check if already exists pool with same name same user
-        if(genericPoolRepository.existsByNameAndStatus(dto.name(),PoolStatus.OPEN)){
+        // 3. check if already exists pool with same name and same user
+        if(genericPoolRepository.existsByNameAndStatusAndOrganizer_Id(
+                dto.name(),
+                PoolStatus.OPEN,
+                user.getId())){
             throw new IllegalArgumentException(ErrorMessages.POOL_ALREADY_EXISTS);
         }
 
-        //check if max 5 active pools is reached
+        // 4. check if max 5 active pools is reached
         long activePools = genericPoolRepository.countByOrganizer_IdAndStatus(user.getId(),PoolStatus.OPEN);
         if(activePools >= MAX_ACTIVE_POOLS) {
             throw new IllegalArgumentException(ErrorMessages.MAX_ACTIVE_POOLS);
         }
 
-        //create generic pool
+        // 5. promote to organizer
+        if(user.promoteToOrganizer()) {
+            userRepository.save(user);
+        }
+
+        // 6. create generic pool (validations with @PrePersist)
         GenericPool genericPool = genericPoolMapper.toEntity(dto, user);
         genericPool.setStatus(PoolStatus.OPEN);
         genericPoolRepository.save(genericPool);
 
-        //add organizer role
-        if(!user.getRoles().contains(Role.ORGANIZER)){
-            user.getRoles().add(Role.ORGANIZER);
-            userRepository.save(user);
-        }
-
-        //create options
+        // 7. create and save options
         List<GenericOption> options = dto.options()
                 .stream()
                 .map(opt -> genericOptionMapper.toEntity(opt, genericPool))
                 .toList();
         genericOptionRepository.saveAll(options);
 
-        //add organizer as participant if creatorChoice is true
-        options.stream()
-                .filter(opt -> Boolean.TRUE.equals(opt.getCreatorChoice()))
-                .findFirst()
-                .ifPresent(creatorOption -> {
-                    GenericParticipantRequestDTO participantRequestDTO =
-                            new GenericParticipantRequestDTO(
-                                    user.getName(),
-                                    user.getId(),
-                                    creatorOption.getId()
-                            );
+        // 8. Add creator as participant (if true)
+        addCreatorAsParticipantIfChosen(genericPool, user, options);
 
-                    genericPoolParticipantService.joinGenericPool(
-                            genericPool.getId(),
-                            participantRequestDTO
-                    );
-                });
-
+        // 9. return answer
         return genericPoolMapper.toResponse(genericPool, options);
+
     }
 
     @Transactional
@@ -128,6 +117,7 @@ public class GenericPoolService {
     }
 
     private void validateOptions(@Size(min = 2, message = "Pool must have at least 2 options.") @Valid List<GenericOptionRequestDTO> options) {
+
         if(options.size() < 2){
             throw new IllegalArgumentException("Pool must have at least 2 options.");
         };
@@ -145,5 +135,28 @@ public class GenericPoolService {
                 creatorChoiceFound = true;
             }
         }
+    }
+
+    private void addCreatorAsParticipantIfChosen(
+            GenericPool genericPool,
+            User user,
+            List<GenericOption> options) {
+
+        options.stream()
+                .filter(opt-> Boolean.TRUE.equals(opt.getCreatorChoice()))
+                .findFirst()
+                .ifPresent(creatorOption -> {
+                    GenericParticipantRequestDTO participantRequestDTO =
+                            new GenericParticipantRequestDTO(
+                                    user.getName(),
+                                    user.getId(),
+                                    creatorOption.getId()
+                            );
+
+                    genericPoolParticipantService.joinGenericPool(
+                            genericPool.getId(),
+                            participantRequestDTO
+                    );
+                });
     }
 }

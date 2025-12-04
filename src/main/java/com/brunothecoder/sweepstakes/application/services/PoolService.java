@@ -71,6 +71,14 @@ public class PoolService {
             userRepository.save(user);
         }
 
+        //check if organizer already has pool with same name
+        if(poolRepository.existsByNameAndStatusAndOrganizer_Id(
+                dto.name(),
+                PoolStatus.OPEN,
+                user.getId())){
+            throw new IllegalArgumentException(ErrorMessages.POOL_ALREADY_EXISTS);
+        }
+
         //save pool
         Pool pool = poolMapper.toEntity(dto, user);
         poolRepository.save(pool);

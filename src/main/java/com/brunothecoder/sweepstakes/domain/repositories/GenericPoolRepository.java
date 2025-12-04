@@ -14,7 +14,11 @@ public interface GenericPoolRepository extends JpaRepository<GenericPool, UUID> 
     @Query("SELECT p from GenericPool p WHERE p.status = 'OPEN' AND p.endDate <= :now")
     List<GenericPool> findAllExpiredGenericPools(@Param("now") LocalDateTime now);
 
-    boolean existsByNameAndStatus(String name, PoolStatus poolStatus);
+    boolean existsByNameAndStatusAndOrganizer_Id(
+            String name,
+            PoolStatus poolStatus,
+            UUID organizerId
+            );
 
     long countByOrganizer_IdAndStatus(UUID organizerId, PoolStatus status);
 }

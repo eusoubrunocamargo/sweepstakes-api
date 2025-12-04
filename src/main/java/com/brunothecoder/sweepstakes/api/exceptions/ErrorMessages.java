@@ -9,6 +9,8 @@ public class ErrorMessages {
     public static final String POOL_INVALID_RANGE = "Valor máximo deve ser maior ou igual ao mínimo.";
     public static final String INVALID_BET_VALUE = "Valor da aposta não pode ser nulo.";
     public static final String POOL_IS_FINALIZED = "Este bolão já está finalizado.";
+    public static final String POOL_INVALID_VALUE = "Valor do bolão está abaixo do mínimo permitido (R$5.00).";
+    public static final String POOL_INVALID_NUMBER_OF_OPTIONS = "Bolão genérico precisa de pelo menos duas opções.";
 
     private ErrorMessages() {}
 
@@ -20,7 +22,7 @@ public class ErrorMessages {
     public static final String POOL_DEADLINE_PASSED = "This pool is no longer accepting participants!";
     public static final String POOL_CAPACITY_EXCEEDED = "Pool has reached its maximum number of participants!";
     public static final String POOL_KEYWORD_INVALID = "Invalid keyword for this pool!";
-    public static final String POOL_ALREADY_EXISTS = "Já existe um bolão ativo com este nome!";
+    public static final String POOL_ALREADY_EXISTS = "O usuário já possui um bolão ativo com este nome!";
     public static final String MAX_ACTIVE_POOLS = "Máximo de 5 bolões ativos!";
 
     // === User / Participant ===
