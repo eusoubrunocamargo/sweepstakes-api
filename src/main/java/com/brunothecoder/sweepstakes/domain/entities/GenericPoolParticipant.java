@@ -11,23 +11,23 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "id")
+//@EqualsAndHashCode(of = "id")
 @Getter
 @Setter
 @Entity
 @Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = {"user_id", "generic_pool_id"})
 }, name = "generic_participant")
-public class GenericPoolParticipant {
+public class GenericPoolParticipant extends BaseParticipant {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User player;
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.UUID)
+//    private UUID id;
+//
+//    @NotNull
+//    @ManyToOne
+//    @JoinColumn(name = "user_id", nullable = false)
+//    private User player;
 
     @NotNull
     @ManyToOne
@@ -39,16 +39,16 @@ public class GenericPoolParticipant {
     @JoinColumn(name = "chosen_option_id", nullable = false)
     private GenericOption chosenOption;
 
-    @NotBlank
-    @Column(nullable = false, length = 50)
-    private String nickname;
-
-    @NotNull
-    @Column(nullable = false)
-    private LocalDateTime joinedAt;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private ParticipantStatus status = ParticipantStatus.PENDING;
+//    @NotBlank
+//    @Column(nullable = false, length = 50)
+//    private String nickname;
+//
+//    @NotNull
+//    @Column(nullable = false)
+//    private LocalDateTime joinedAt;
+//
+//    @Enumerated(EnumType.STRING)
+//    @Column(nullable = false, length = 20)
+//    private ParticipantStatus status = ParticipantStatus.PENDING;
 
 }

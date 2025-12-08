@@ -19,13 +19,14 @@ public class GenericParticipantMapper {
             GenericPool genericPool,
             GenericOption option){
 
-        return GenericPoolParticipant.builder()
-                .nickname(dto.nickname())
-                .player(user)
-                .genericPool(genericPool)
-                .chosenOption(option)
-                .joinedAt(LocalDateTime.now())
-                .build();
+        GenericPoolParticipant participant = new GenericPoolParticipant();
+
+        participant.setPlayer(user);
+        participant.setNickname(dto.nickname());
+        participant.setGenericPool(genericPool);
+        participant.setChosenOption(option);
+
+        return participant;
     }
 
     public GenericParticipantResponseDTO toResponse(GenericPoolParticipant participant){

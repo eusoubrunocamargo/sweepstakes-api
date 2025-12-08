@@ -15,12 +15,15 @@ public class PoolParticipantMapper {
             PoolParticipantRequestDTO poolParticipantRequestDTO,
             User user,
             Pool pool){
-        return PoolParticipant.builder()
-                .player(user)
-                .pool(pool)
-                .nickname(poolParticipantRequestDTO.nickname())
-                .maxValueToBet(poolParticipantRequestDTO.maxValueToBet())
-                .build();
+
+        PoolParticipant participant = new PoolParticipant();
+
+        participant.setPlayer(user);
+        participant.setNickname(poolParticipantRequestDTO.nickname());
+        participant.setPool(pool);
+        participant.setMaxValueToBet(poolParticipantRequestDTO.maxValueToBet());
+
+        return participant;
     }
 
     public PoolParticipantResponseDTO toResponse(PoolParticipant poolParticipant){

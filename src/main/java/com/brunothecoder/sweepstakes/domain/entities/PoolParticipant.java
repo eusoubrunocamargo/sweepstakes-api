@@ -11,7 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "id")
+//@EqualsAndHashCode(of = "id")
 @Getter
 @Setter
 @Entity
@@ -19,37 +19,38 @@ import java.util.UUID;
         @UniqueConstraint(columnNames = {"user_id", "pool_id"}),
         @UniqueConstraint(columnNames = {"nickname", "pool_id"})
 })
-public class PoolParticipant {
+public class PoolParticipant extends BaseParticipant {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.UUID)
+//    private UUID id;
+//
+//    @NotNull
+//    @ManyToOne
+//    @JoinColumn(name = "user_id", nullable = false)
+//    private User player;
 
     @NotNull
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User player;
-
-    @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pool_id", nullable = false)
     private Pool pool;
 
-    @NotBlank
-    @Size(max = 50)
-    @Column(nullable = false, length = 50)
-    private String nickname;
+//    @NotBlank
+//    @Size(max = 50)
+//    @Column(nullable = false, length = 50)
+//    private String nickname;
 
     @DecimalMin("5.00")
     @Digits(integer = 10, fraction = 2)
+    @Column(name = "max_value_to_bet")
     private BigDecimal maxValueToBet;
 
-    @NotNull
-    @Column(nullable = false)
-    private LocalDateTime joinedAt;
+//    @NotNull
+//    @Column(nullable = false)
+//    private LocalDateTime joinedAt;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private ParticipantStatus status = ParticipantStatus.PENDING;
+//    @Enumerated(EnumType.STRING)
+//    @Column(nullable = false, length = 20)
+//    private ParticipantStatus status = ParticipantStatus.PENDING;
 
 }

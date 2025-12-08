@@ -11,6 +11,8 @@ public class ErrorMessages {
     public static final String POOL_IS_FINALIZED = "Este bolão já está finalizado.";
     public static final String POOL_INVALID_VALUE = "Valor do bolão está abaixo do mínimo permitido (R$5.00).";
     public static final String POOL_INVALID_NUMBER_OF_OPTIONS = "Bolão genérico precisa de pelo menos duas opções.";
+    public static final String PARTICIPANT_ALREADY_CONFIRMED = "Participante já está confirmado.";
+    public static final String EXPIRED_MUST_BE_PENDING = "Apenas participantes pendentes podem ser marcados como expirados.";
 
     private ErrorMessages() {}
 
