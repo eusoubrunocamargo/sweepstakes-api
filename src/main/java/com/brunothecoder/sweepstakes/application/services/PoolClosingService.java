@@ -53,7 +53,7 @@ public class PoolClosingService {
 
     public void processPoolClosure(Pool pool) {
 
-        pool.setStatus(PoolStatus.FINALIZED);
+        pool.finalizePool();
         poolRepository.save(pool);
         generateClosingReport(pool.getId());
 

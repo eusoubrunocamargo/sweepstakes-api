@@ -50,7 +50,7 @@ public class GenericPoolClosingService {
     private void processGenericPoolClosure(GenericPool genericPool) {
 
         //finalize generic pools
-        genericPool.setFinalized(true);
+        genericPool.finalizePool();
         genericPoolRepository.save(genericPool);
 
         //update participants: pending -> expired
@@ -63,25 +63,25 @@ public class GenericPoolClosingService {
     }
 
     @Transactional
-    public GenericClosingReportDTO generateClosingReport(UUID poolId) {
+    public void generateClosingReport(UUID poolId) {
 
-        //check if generic pools exists
+        //get generic pool
         GenericPool genericPool = genericPoolRepository.findById(poolId)
                 .orElseThrow(()-> new EntityNotFoundException(ErrorMessages.POOL_NOT_FOUND));
+
+        //get generic pool participants with options
+        List<GenericPoolParticipant> participants =
+                genericPoolParticipantRepository.findAllWithOptionsByPoolId(poolId);
 
         //get confirmed total amount
         BigDecimal grossAmount = genericPoolParticipantRepository.getConfirmedTotalAmount(poolId);
         if(grossAmount == null || grossAmount.compareTo(BigDecimal.ZERO) == 0){
             grossAmount = BigDecimal.ZERO;
         }
-        final BigDecimal totalAmount = grossAmount;
 
         //get net amount and platform fee
-        BigDecimal netAmount = financialService.calculateNetAmountForBetting(totalAmount, genericPool.getAdminFeePercentage());
-        BigDecimal platformFee = totalAmount.multiply(BigDecimal.valueOf(0.05));
-
-        //get participants
-        List<GenericPoolParticipant> participants = genericPoolParticipantRepository.findAllByGenericPool_Id(poolId);
+        BigDecimal platformFee = genericPool.calculatePlatformFee(grossAmount);
+        BigDecimal netAmount = genericPool.calculateNetAmount(grossAmount);
 
         //get prize by scenarios
         Map<String, BigDecimal> prizeMap = financialService.getPrizeOnWin(poolId);
@@ -95,7 +95,7 @@ public class GenericPoolClosingService {
         //List of confirmed with prize
         List<ConfirmedParticipantResultDTO> confirmedParticipants = participants
                 .stream()
-                .filter(p -> p.getStatus() == ParticipantStatus.CONFIRMED)
+                .filter(GenericPoolParticipant::isConfirmed)
                 .map(p -> new ConfirmedParticipantResultDTO(
                         p.getNickname(),
                         p.getChosenOption().getLabel(),
@@ -112,12 +112,12 @@ public class GenericPoolClosingService {
                 .map(p -> new ExpiredParticipantDTO(p.getNickname()))
                 .toList();
 
-        return new GenericClosingReportDTO(
+        new GenericClosingReportDTO(
                 genericPool.getName(),
                 genericPool.getDescription(),
                 genericPool.getOrganizer().getName(),
                 genericPool.getPoolValue(),
-                totalAmount,
+                grossAmount,
                 platformFee,
                 netAmount,
                 genericPool.getEndDate(),

@@ -46,15 +46,15 @@ public class GenericPoolParticipantService {
             GenericParticipantRequestDTO dto
     ){
 
-        //check genericPool
+        //get genericPool
         GenericPool genericPool = genericPoolRepository.findById(genericPoolId)
                 .orElseThrow(()-> new EntityNotFoundException(ErrorMessages.POOL_NOT_FOUND));
 
-        //check user
+        //get user
         User user = userRepository.findById(dto.userId())
                 .orElseThrow(()-> new EntityNotFoundException(ErrorMessages.USER_NOT_FOUND));
 
-        //check option
+        //get option
         GenericOption option = genericOptionRepository.findById(dto.chosenOptionId())
                 .orElseThrow(()-> new EntityNotFoundException("Option not found."));
 
@@ -62,7 +62,7 @@ public class GenericPoolParticipantService {
         GenericPoolParticipant participant = genericParticipantMapper.toEntity(
                 dto, user, genericPool, option
         );
-        participant.setStatus(ParticipantStatus.PENDING);
+
         genericPoolParticipantRepository.save(participant);
 
         return genericParticipantMapper.toResponse(participant);

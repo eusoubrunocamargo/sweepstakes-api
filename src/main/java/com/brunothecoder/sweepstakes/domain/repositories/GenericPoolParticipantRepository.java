@@ -13,6 +13,11 @@ import java.util.UUID;
 public interface GenericPoolParticipantRepository extends JpaRepository<GenericPoolParticipant, UUID> {
     List<GenericPoolParticipant> findAllByGenericPool_Id(UUID genericPoolId);
 
+    @Query("SELECT gp FROM GenericPoolParticipant gp " +
+            "LEFT JOIN FETCH gp.chosenOption " +
+            "WHERE gp.genericPool.id = :poolId")
+    List<GenericPoolParticipant> findAllWithOptionsByPoolId(@Param("poolId") UUID poolId);
+
     @Modifying
     @Query("UPDATE GenericPoolParticipant gp " +
             "SET gp.status = 'EXPIRED' " +

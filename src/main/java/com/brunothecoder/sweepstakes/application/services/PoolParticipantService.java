@@ -22,7 +22,7 @@ public class PoolParticipantService {
     private final UserRepository userRepository;
     private final PoolRepository poolRepository;
     private final PoolParticipantMapper poolParticipantMapper;
-    private final PoolService poolService;
+//    private final PoolService poolService;
 
     public PoolParticipantService(
             PoolParticipantRepository poolParticipantRepository,
@@ -36,7 +36,7 @@ public class PoolParticipantService {
         this.userRepository = userRepository;
         this.poolRepository = poolRepository;
         this.poolParticipantMapper = poolParticipantMapper;
-        this.poolService = poolService;
+//        this.poolService = poolService;
     }
 
     @Transactional
@@ -49,32 +49,20 @@ public class PoolParticipantService {
                 .orElseThrow(()-> new EntityNotFoundException((ErrorMessages.POOL_NOT_FOUND)));
 
         //check if informed keyword matches pool keyword
-        if(!pool.getKeyword().equals(poolParticipantRequestDTO.keyword())){
-            throw new IllegalArgumentException(ErrorMessages.POOL_KEYWORD_INVALID);
-        }
+        pool.validateKeyword(poolParticipantRequestDTO.keyword());
 
         //check if user_maxValueToBet is within Pool range
-        BigDecimal poolMin = pool.getMinValuePerShare();
-        BigDecimal poolMax = pool.getMaxValuePerShare();
-        BigDecimal userMaxValueToBet = poolParticipantRequestDTO.maxValueToBet();
-        if(userMaxValueToBet.compareTo(poolMin) < 0){
-            throw new IllegalArgumentException((ErrorMessages.BELOW_POOL_MIN));
-        }
-        if(userMaxValueToBet.compareTo(poolMax) > 0){
-            throw new IllegalArgumentException(ErrorMessages.ABOVE_POOL_MAX);
-        }
+        pool.validateBetValue(poolParticipantRequestDTO.maxValueToBet());
 
         //check if player exists and is validated
         User player = userRepository.findById(poolParticipantRequestDTO.userId())
                 .orElseThrow(()-> new EntityNotFoundException(ErrorMessages.USER_NOT_FOUND));
 
+        //create participant
         PoolParticipant poolParticipant = poolParticipantMapper.toEntity(poolParticipantRequestDTO, player, pool);
-        poolParticipant.setJoinedAt(LocalDateTime.now());
-        poolParticipant.setStatus(ParticipantStatus.PENDING);
+
         poolParticipantRepository.save(poolParticipant);
 
-        //update cache with totalAmount
-//        BigDecimal updatedTotal = poolService.calculateTotalAmount(poolId);
         return poolParticipantMapper.toResponse(poolParticipant);
     }
 
@@ -91,9 +79,7 @@ public class PoolParticipantService {
         PoolParticipant participant = poolParticipantRepository.findById(participantId)
                 .orElseThrow(()-> new EntityNotFoundException("Pool Participant not found."));
 
-        if(participant.getStatus() != ParticipantStatus.CONFIRMED){
-            participant.setStatus(ParticipantStatus.CONFIRMED);
-        }
+        participant.confirmPayment();
 
         poolParticipantRepository.save(participant);
     }
