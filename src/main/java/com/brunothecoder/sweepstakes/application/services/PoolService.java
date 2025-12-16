@@ -8,7 +8,6 @@ import com.brunothecoder.sweepstakes.api.exceptions.ErrorMessages;
 import com.brunothecoder.sweepstakes.api.mappers.GameDistributionMapper;
 import com.brunothecoder.sweepstakes.api.mappers.PoolMapper;
 import com.brunothecoder.sweepstakes.api.mappers.PoolParticipantMapper;
-import com.brunothecoder.sweepstakes.application.services.cache.PoolCacheService;
 import com.brunothecoder.sweepstakes.application.services.calculators.GameDistributionResult;
 import com.brunothecoder.sweepstakes.application.services.calculators.MegaSenaCalculator;
 import com.brunothecoder.sweepstakes.domain.entities.*;
@@ -26,18 +25,13 @@ import java.util.*;
 @Service
 public class PoolService {
 
-//    @Autowired
-//    private MegaSenaCalculator megaSenaCalculator;
-
     private final PoolRepository poolRepository;
     private final PoolMapper poolMapper;
     private final UserRepository userRepository;
     private final PoolParticipantRepository poolParticipantRepository;
-//    private final PoolCacheService poolCacheService;
     private final MegaSenaCalculator megaSenaCalculator;
     private final PoolParticipantMapper poolParticipantMapper;
     private final FinancialService financialService;
-    private final BigDecimal PLATFORM_FEE = BigDecimal.valueOf(0.05);
 
     public PoolService(
             PoolRepository poolRepository,
@@ -45,7 +39,6 @@ public class PoolService {
             UserRepository userRepository,
             PoolParticipantRepository poolParticipantRepository,
             PoolParticipantMapper poolParticipantMapper,
-            PoolCacheService poolCacheService,
             MegaSenaCalculator megaSenaCalculator,
             FinancialService financialService
     ){
@@ -53,7 +46,6 @@ public class PoolService {
         this.poolMapper = poolMapper;
         this.userRepository = userRepository;
         this.poolParticipantRepository = poolParticipantRepository;
-//        this.poolCacheService = poolCacheService;
         this.poolParticipantMapper = poolParticipantMapper;
         this.megaSenaCalculator = megaSenaCalculator;
         this.financialService = financialService;
@@ -94,16 +86,6 @@ public class PoolService {
     }
 
     public BigDecimal calculateTotalAmount(UUID poolId){
-        //calc total amount
-
-        //cache totalAmount
-        //poolCacheService.cachePoolStats(poolId, totalAmount);
-
-//        return poolParticipantRepository.findAllByPoolId(poolId)
-//                .stream()
-//                .map(PoolParticipant::getMaxValueToBet)
-//                .filter(Objects::nonNull)
-//                .reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal total = poolParticipantRepository.getConfirmedTotalAmount(poolId);
         return Objects.requireNonNullElse(total, BigDecimal.ZERO);
     }
@@ -123,7 +105,6 @@ public class PoolService {
         BigDecimal netAmountForBetting = financialService.calculateNetAmountForBetting
                 (confirmedGrossAmount, pool.getAdminFeePercentage());
 
-//        GameDistributionResult result = megaSenaCalculator.calculate(calculateTotalAmount(poolId));
         GameDistributionResult result = megaSenaCalculator.calculate(netAmountForBetting);
         return GameDistributionMapper.toResponse(
                 pool,
