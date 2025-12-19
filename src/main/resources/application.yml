@@ -1,9 +1,8 @@
-
 spring:
   datasource:
-    url: ${DATABASE_URL:jdbc:mysql://localhost:3306/sweepstakes_api}
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:root}
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/sweepstakes_api}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
