@@ -12,6 +12,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
+    show-sql: true
 
   flyway:
     enabled: true
@@ -23,4 +24,5 @@ server:
 logging:
   level:
     com.brunothecoder.sweepstakes: INFO
-    org.hibernate.SQL: WARN
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE  # mostra os parâmetros

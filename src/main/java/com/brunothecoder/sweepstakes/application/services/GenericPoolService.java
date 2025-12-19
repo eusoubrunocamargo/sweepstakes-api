@@ -104,17 +104,47 @@ public class GenericPoolService {
 
     @Transactional
     public List<GenericPoolResponseDTO> listAllGenericPools(){
-        return genericPoolRepository.findAll()
+        return genericPoolRepository.findAllWithOptionsAndOrganizer()
                 .stream()
                 .map(genericPool -> {
-                    List<GenericOption> options =
-                            genericOptionRepository.findByGenericPool_Id(genericPool.getId());
-                    return genericPoolMapper.toResponse(genericPool, options);
-                })
-                .toList();
+                    List<GenericOption> options = genericPool.getOptions();
 
+                    if(options == null){
+                        options = List.of();
+                    }
+
+                    return genericPoolMapper.toResponse(
+                        genericPool, options
+                );
+                }).toList();
+    }
+
+    @Transactional
+    public GenericPoolResponseDTO findById(UUID poolId) {
+        GenericPool genericPool = genericPoolRepository
+                .findByIdWithOptionsAndOrganizer(poolId)
+                .orElseThrow(()-> new EntityNotFoundException(ErrorMessages.POOL_NOT_FOUND));
+
+        List<GenericOption> options = genericPool.getOptions();
+        if (options == null) {
+            options = List.of();
+        }
+
+        return genericPoolMapper.toResponse(genericPool, options);
 
     }
+//    public List<GenericPoolResponseDTO> listAllGenericPools(){
+//        return genericPoolRepository.findAll()
+//                .stream()
+//                .map(genericPool -> {
+//                    List<GenericOption> options =
+//                            genericOptionRepository.findByGenericPool_Id(genericPool.getId());
+//                    return genericPoolMapper.toResponse(genericPool, options);
+//                })
+//                .toList();
+//
+//
+//    }
 
     private void validateOptions(@Size(min = 2, message = "Pool must have at least 2 options.") @Valid List<GenericOptionRequestDTO> options) {
 

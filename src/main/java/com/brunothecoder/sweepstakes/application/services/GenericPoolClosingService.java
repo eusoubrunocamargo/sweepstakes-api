@@ -42,7 +42,7 @@ public class GenericPoolClosingService {
     @Transactional
     public void closeExpiredGenericPools() {
         List<GenericPool> expiredGenericPools =
-                genericPoolRepository.findAllExpiredGenericPools(LocalDateTime.now());
+                genericPoolRepository.findAllExpiredWithOrganizer(LocalDateTime.now());
         expiredGenericPools.forEach(this::processGenericPoolClosure);
     }
 
@@ -63,10 +63,10 @@ public class GenericPoolClosingService {
     }
 
     @Transactional
-    public void generateClosingReport(UUID poolId) {
+    public GenericClosingReportDTO generateClosingReport(UUID poolId) {
 
         //get generic pool
-        GenericPool genericPool = genericPoolRepository.findById(poolId)
+        GenericPool genericPool = genericPoolRepository.findByIdWithOptionsAndOrganizer(poolId)
                 .orElseThrow(()-> new EntityNotFoundException(ErrorMessages.POOL_NOT_FOUND));
 
         //get generic pool participants with options
@@ -107,12 +107,11 @@ public class GenericPoolClosingService {
         List<ExpiredParticipantDTO> expiredParticipants = participants
                 .stream()
                 .filter(p ->
-                        p.getStatus() == ParticipantStatus.EXPIRED ||
-                                p.getStatus() == ParticipantStatus.CANCELED)
+                        p.getStatus() == ParticipantStatus.EXPIRED || p.getStatus() == ParticipantStatus.CANCELED)
                 .map(p -> new ExpiredParticipantDTO(p.getNickname()))
                 .toList();
 
-        new GenericClosingReportDTO(
+        return new GenericClosingReportDTO(
                 genericPool.getName(),
                 genericPool.getDescription(),
                 genericPool.getOrganizer().getName(),
@@ -128,7 +127,5 @@ public class GenericPoolClosingService {
                 expiredParticipants
         );
     }
-
-
 
 }
