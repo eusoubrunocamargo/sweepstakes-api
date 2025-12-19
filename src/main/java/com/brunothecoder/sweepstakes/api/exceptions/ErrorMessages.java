@@ -13,6 +13,7 @@ public class ErrorMessages {
     public static final String POOL_INVALID_NUMBER_OF_OPTIONS = "Bolão genérico precisa de pelo menos duas opções.";
     public static final String PARTICIPANT_ALREADY_CONFIRMED = "Participante já está confirmado.";
     public static final String EXPIRED_MUST_BE_PENDING = "Apenas participantes pendentes podem ser marcados como expirados.";
+    public static final String OPTION_NOT_FOUND = "Opção não encontrada.";
 
     private ErrorMessages() {}
 

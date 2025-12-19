@@ -67,7 +67,7 @@ public class PoolParticipantService {
     }
 
     public List<PoolParticipantResponseDTO> listParticipantsByPool(UUID poolId){
-        return poolParticipantRepository.findAllByPoolId(poolId)
+        return poolParticipantRepository.findAllByPoolIdWithPlayerAndPool(poolId)
                 .stream()
                 .map(poolParticipantMapper::toResponse)
                 .toList();
@@ -82,5 +82,12 @@ public class PoolParticipantService {
         participant.confirmPayment();
 
         poolParticipantRepository.save(participant);
+    }
+
+    public List<PoolParticipantResponseDTO> listConfirmedParticipantsByPool(UUID poolId) {
+        return poolParticipantRepository.findConfirmedByPoolIdWithPlayer(poolId)
+                .stream()
+                .map(poolParticipantMapper::toResponse)
+                .toList();
     }
 }

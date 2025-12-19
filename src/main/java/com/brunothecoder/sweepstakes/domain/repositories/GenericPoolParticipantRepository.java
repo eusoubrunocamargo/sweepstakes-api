@@ -11,19 +11,24 @@ import java.util.List;
 import java.util.UUID;
 
 public interface GenericPoolParticipantRepository extends JpaRepository<GenericPoolParticipant, UUID> {
-    List<GenericPoolParticipant> findAllByGenericPool_Id(UUID genericPoolId);
 
+    //---> optimized queries
+
+    //detailed list of participants
+    @Query("SELECT gp FROM GenericPoolParticipant gp JOIN FETCH gp.player JOIN FETCH gp.genericPool JOIN FETCH gp.chosenOption WHERE gp.genericPool.id = :poolId")
+    List<GenericPoolParticipant> findAllByPoolIdWithAllRelations(@Param("poolId") UUID poolId);
+
+    //load participants with their options
     @Query("SELECT gp FROM GenericPoolParticipant gp " +
             "LEFT JOIN FETCH gp.chosenOption " +
             "WHERE gp.genericPool.id = :poolId")
     List<GenericPoolParticipant> findAllWithOptionsByPoolId(@Param("poolId") UUID poolId);
 
-    @Modifying
-    @Query("UPDATE GenericPoolParticipant gp " +
-            "SET gp.status = 'EXPIRED' " +
-            "WHERE gp.genericPool.id = :poolId " +
-            "AND gp.status = 'PENDING'")
-    void expirePendingParticipants(@Param("poolId") UUID id);
+    //load players and option
+    @Query("SELECT gp FROM GenericPoolParticipant gp JOIN FETCH gp.player JOIN FETCH gp.chosenOption WHERE gp.genericPool.id = :poolId")
+    List<GenericPoolParticipant> findAllByPoolIdWithPlayerAndOption(@Param("poolId") UUID poolId);
+
+    //---> aggregation queries
 
     @Query("SELECT COALESCE(SUM(gp.genericPool.poolValue), 0) " +
             "FROM GenericPoolParticipant gp " +
@@ -35,6 +40,7 @@ public interface GenericPoolParticipantRepository extends JpaRepository<GenericP
         String getOptionLabel();
         Long getCount();
     }
+
     @Query("SELECT gp.chosenOption.label AS optionLabel," +
             "COUNT(gp) AS count " +
             "FROM GenericPoolParticipant gp " +
@@ -42,4 +48,18 @@ public interface GenericPoolParticipantRepository extends JpaRepository<GenericP
             "AND gp.status = 'CONFIRMED' " +
             "GROUP BY gp.chosenOption.label")
     List<OptionCountProjection> countConfirmedByOption(@Param("poolId") UUID poolId);
+
+    //---> bulk updates
+
+    @Modifying
+    @Query("UPDATE GenericPoolParticipant gp " +
+            "SET gp.status = 'EXPIRED' " +
+            "WHERE gp.genericPool.id = :poolId " +
+            "AND gp.status = 'PENDING'")
+    void expirePendingParticipants(@Param("poolId") UUID id);
+
+    //deprecated
+    @Deprecated
+    List<GenericPoolParticipant> findAllByGenericPool_Id(UUID genericPoolId);
+
 }

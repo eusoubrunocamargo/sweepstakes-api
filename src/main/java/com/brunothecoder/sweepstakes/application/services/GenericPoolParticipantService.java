@@ -2,7 +2,6 @@ package com.brunothecoder.sweepstakes.application.services;
 
 import com.brunothecoder.sweepstakes.api.dto.genericpool_participant.GenericParticipantRequestDTO;
 import com.brunothecoder.sweepstakes.api.dto.genericpool_participant.GenericParticipantResponseDTO;
-import com.brunothecoder.sweepstakes.api.dto.pool_generic.GenericPoolRequestDTO;
 import com.brunothecoder.sweepstakes.api.exceptions.ErrorMessages;
 import com.brunothecoder.sweepstakes.api.mappers.GenericParticipantMapper;
 import com.brunothecoder.sweepstakes.domain.entities.*;
@@ -56,7 +55,7 @@ public class GenericPoolParticipantService {
 
         //get option
         GenericOption option = genericOptionRepository.findById(dto.chosenOptionId())
-                .orElseThrow(()-> new EntityNotFoundException("Option not found."));
+                .orElseThrow(()-> new EntityNotFoundException(ErrorMessages.OPTION_NOT_FOUND));
 
         //create participation
         GenericPoolParticipant participant = genericParticipantMapper.toEntity(
@@ -69,7 +68,14 @@ public class GenericPoolParticipantService {
     }
 
     public List<GenericParticipantResponseDTO> listParticipantsByGenericPoolId(UUID genericPoolId){
-        return genericPoolParticipantRepository.findAllByGenericPool_Id(genericPoolId)
+        return genericPoolParticipantRepository.findAllByPoolIdWithAllRelations(genericPoolId)
+                .stream()
+                .map(genericParticipantMapper::toResponse)
+                .toList();
+    }
+
+    public List<GenericParticipantResponseDTO> listParticipantsWithChoices(UUID genericPoolId){
+        return genericPoolParticipantRepository.findAllByPoolIdWithPlayerAndOption(genericPoolId)
                 .stream()
                 .map(genericParticipantMapper::toResponse)
                 .toList();

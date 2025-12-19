@@ -82,7 +82,14 @@ public class PoolService {
     }
 
     public List<PoolResponseDTO> listAllPools(){
-        return poolRepository.findAll().stream().map(poolMapper::toResponse).toList();
+        return poolRepository.findAllWithOrganizer().stream().map(poolMapper::toResponse).toList();
+    }
+
+    public PoolResponseDTO findById(UUID poolId) {
+        Pool pool = poolRepository.findByIdWithOrganizer(poolId)
+                .orElseThrow(()-> new EntityNotFoundException(ErrorMessages.POOL_NOT_FOUND));
+
+        return poolMapper.toResponse(pool);
     }
 
     public BigDecimal calculateTotalAmount(UUID poolId){
@@ -95,7 +102,8 @@ public class PoolService {
     }
     public GameDistributionResponseDTO calculateGameDistribution(UUID poolId){
 
-        Pool pool = poolRepository.findById(poolId).orElseThrow(()-> new EntityNotFoundException("Pool not found!"));
+        //load pool with organizer in 1 query
+        Pool pool = poolRepository.findByIdWithOrganizer(poolId).orElseThrow(()-> new EntityNotFoundException(ErrorMessages.POOL_NOT_FOUND));
 
         //Gross amount from confirmed participants
         BigDecimal confirmedGrossAmount = poolParticipantRepository.getConfirmedTotalAmount(poolId);
@@ -106,6 +114,7 @@ public class PoolService {
                 (confirmedGrossAmount, pool.getAdminFeePercentage());
 
         GameDistributionResult result = megaSenaCalculator.calculate(netAmountForBetting);
+
         return GameDistributionMapper.toResponse(
                 pool,
                 result,
