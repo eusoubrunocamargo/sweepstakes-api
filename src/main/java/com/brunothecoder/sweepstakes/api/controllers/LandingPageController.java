@@ -8,6 +8,6 @@ public class LandingPageController {
 
     @GetMapping("/")
     public String landingPage() {
-        return "index";
+        return "redirect:/index.html";
     }
 }
