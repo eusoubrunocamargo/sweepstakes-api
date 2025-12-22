@@ -45,7 +45,7 @@ public class PoolClosingService {
     @Scheduled(cron = "0 0 * * * *")
     @Transactional
     public void closeExpiredPools() {
-        List<Pool> expiredPools = poolRepository.findAllExpiredPools(LocalDateTime.now());
+        List<Pool> expiredPools = poolRepository.findAllExpiredPoolWithOrganizer(LocalDateTime.now());
         for (Pool pool : expiredPools) {
             processPoolClosure(pool);
         }
