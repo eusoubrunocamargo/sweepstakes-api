@@ -14,6 +14,7 @@ public class ErrorMessages {
     public static final String PARTICIPANT_ALREADY_CONFIRMED = "Participante já está confirmado.";
     public static final String EXPIRED_MUST_BE_PENDING = "Apenas participantes pendentes podem ser marcados como expirados.";
     public static final String OPTION_NOT_FOUND = "Opção não encontrada.";
+    public static final String NO_CALCULATOR_FOR_THIS_TYPE = "Calculadora não implementada para o tipo escolhido. ";
 
     private ErrorMessages() {}
 

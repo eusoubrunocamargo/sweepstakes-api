@@ -1,5 +1,6 @@
 package com.brunothecoder.sweepstakes.application.services.calculators;
 
+import com.brunothecoder.sweepstakes.domain.entities.LotteryType;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -8,7 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Component
-public class MegaSenaCalculator {
+public class MegaSenaStrategy implements GameDistributionStrategy {
 
     private static final Map<Integer, BigDecimal> PRICES = Map.ofEntries(
             Map.entry(6,BigDecimal.valueOf(6.00)),
@@ -28,6 +29,7 @@ public class MegaSenaCalculator {
             Map.entry(20, BigDecimal.valueOf(232560.00))
     );
 
+    @Override
     public GameDistributionResult calculate (BigDecimal totalAmount){
         BigDecimal remaining = totalAmount;
         Map<Integer,Integer> distribution = new LinkedHashMap<>();
@@ -47,5 +49,10 @@ public class MegaSenaCalculator {
 
     public static BigDecimal getPrice(int numbers){
         return PRICES.get(numbers);
+    }
+
+    @Override
+    public LotteryType getLotteryType(){
+        return LotteryType.MEGASENA;
     }
 }

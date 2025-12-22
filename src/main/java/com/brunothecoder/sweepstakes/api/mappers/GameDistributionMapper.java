@@ -3,7 +3,7 @@ package com.brunothecoder.sweepstakes.api.mappers;
 import com.brunothecoder.sweepstakes.api.dto.megasena.GameDetailDTO;
 import com.brunothecoder.sweepstakes.api.dto.megasena.GameDistributionResponseDTO;
 import com.brunothecoder.sweepstakes.application.services.calculators.GameDistributionResult;
-import com.brunothecoder.sweepstakes.application.services.calculators.MegaSenaCalculator;
+import com.brunothecoder.sweepstakes.application.services.calculators.MegaSenaStrategy;
 import com.brunothecoder.sweepstakes.domain.entities.Pool;
 import org.springframework.stereotype.Component;
 
@@ -38,7 +38,7 @@ public class GameDistributionMapper {
                 .map(entry -> {
                     int numbers = entry.getKey();
                     int quantity = entry.getValue();
-                    BigDecimal cost = MegaSenaCalculator
+                    BigDecimal cost = MegaSenaStrategy
                             .getPrice(numbers)
                             .multiply(BigDecimal.valueOf(quantity));
                     return new GameDetailDTO(numbers, quantity, cost);

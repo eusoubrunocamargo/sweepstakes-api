@@ -9,7 +9,9 @@ import com.brunothecoder.sweepstakes.api.mappers.GameDistributionMapper;
 import com.brunothecoder.sweepstakes.api.mappers.PoolMapper;
 import com.brunothecoder.sweepstakes.api.mappers.PoolParticipantMapper;
 import com.brunothecoder.sweepstakes.application.services.calculators.GameDistributionResult;
-import com.brunothecoder.sweepstakes.application.services.calculators.MegaSenaCalculator;
+import com.brunothecoder.sweepstakes.application.services.calculators.GameDistributionStrategy;
+import com.brunothecoder.sweepstakes.application.services.calculators.GameDistributionStrategyFactory;
+import com.brunothecoder.sweepstakes.application.services.calculators.MegaSenaStrategy;
 import com.brunothecoder.sweepstakes.domain.entities.*;
 import com.brunothecoder.sweepstakes.domain.repositories.PoolParticipantRepository;
 import com.brunothecoder.sweepstakes.domain.repositories.PoolRepository;
@@ -29,9 +31,10 @@ public class PoolService {
     private final PoolMapper poolMapper;
     private final UserRepository userRepository;
     private final PoolParticipantRepository poolParticipantRepository;
-    private final MegaSenaCalculator megaSenaCalculator;
+    private final MegaSenaStrategy megaSenaStrategy;
     private final PoolParticipantMapper poolParticipantMapper;
     private final FinancialService financialService;
+    private final GameDistributionStrategyFactory strategyFactory;
 
     public PoolService(
             PoolRepository poolRepository,
@@ -39,16 +42,18 @@ public class PoolService {
             UserRepository userRepository,
             PoolParticipantRepository poolParticipantRepository,
             PoolParticipantMapper poolParticipantMapper,
-            MegaSenaCalculator megaSenaCalculator,
-            FinancialService financialService
+            MegaSenaStrategy megaSenaStrategy,
+            FinancialService financialService,
+            GameDistributionStrategyFactory strategyFactory
     ){
         this.poolRepository = poolRepository;
         this.poolMapper = poolMapper;
         this.userRepository = userRepository;
         this.poolParticipantRepository = poolParticipantRepository;
         this.poolParticipantMapper = poolParticipantMapper;
-        this.megaSenaCalculator = megaSenaCalculator;
+        this.megaSenaStrategy = megaSenaStrategy;
         this.financialService = financialService;
+        this.strategyFactory = strategyFactory;
     }
 
     @Transactional
@@ -100,6 +105,7 @@ public class PoolService {
     public BigDecimal getCachedTotalAmount(UUID poolId){
         return calculateTotalAmount(poolId);
     }
+
     public GameDistributionResponseDTO calculateGameDistribution(UUID poolId){
 
         //load pool with organizer in 1 query
@@ -113,7 +119,11 @@ public class PoolService {
         BigDecimal netAmountForBetting = financialService.calculateNetAmountForBetting
                 (confirmedGrossAmount, pool.getAdminFeePercentage());
 
-        GameDistributionResult result = megaSenaCalculator.calculate(netAmountForBetting);
+        //Strategy Pattern
+        GameDistributionStrategy strategy = strategyFactory.getStrategy(pool.getLotteryType());
+        GameDistributionResult result = strategy.calculate(netAmountForBetting);
+
+//        GameDistributionResult result = megaSenaStrategy.calculate(netAmountForBetting);
 
         return GameDistributionMapper.toResponse(
                 pool,
