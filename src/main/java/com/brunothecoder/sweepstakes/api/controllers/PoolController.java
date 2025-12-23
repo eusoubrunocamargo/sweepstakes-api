@@ -36,6 +36,12 @@ public class PoolController {
         return ResponseEntity.ok(poolService.listAllPools());
     }
 
+    @GetMapping("/{poolId}")
+    public ResponseEntity<PoolResponseDTO> getById(@PathVariable UUID poolId) {
+        PoolResponseDTO response = poolService.findById(poolId);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/{poolId}/total-amount")
     public ResponseEntity<BigDecimal> getCachedTotalAmount(@PathVariable UUID poolId){
         BigDecimal total = poolService.getCachedTotalAmount(poolId);

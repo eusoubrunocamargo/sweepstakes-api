@@ -91,10 +91,15 @@ public class PoolService {
     }
 
     public PoolResponseDTO findById(UUID poolId) {
+        //search pool
         Pool pool = poolRepository.findByIdWithOrganizer(poolId)
                 .orElseThrow(()-> new EntityNotFoundException(ErrorMessages.POOL_NOT_FOUND));
 
-        return poolMapper.toResponse(pool);
+        //calc distribution
+        GameDistributionResponseDTO distribution = this.calculateGameDistribution(poolId);
+
+        //full mapper
+        return poolMapper.toResponse(pool, distribution);
     }
 
     public BigDecimal calculateTotalAmount(UUID poolId){

@@ -1,5 +1,6 @@
 package com.brunothecoder.sweepstakes.api.mappers;
 
+import com.brunothecoder.sweepstakes.api.dto.megasena.GameDistributionResponseDTO;
 import com.brunothecoder.sweepstakes.api.dto.pool.PoolRequestDTO;
 import com.brunothecoder.sweepstakes.api.dto.pool.PoolResponseDTO;
 import com.brunothecoder.sweepstakes.domain.entities.Pool;
@@ -28,7 +29,8 @@ public class PoolMapper {
         return pool;
     }
 
-    public PoolResponseDTO toResponse (Pool pool){
+    public PoolResponseDTO toResponse (Pool pool, GameDistributionResponseDTO distributionResponseDTO){
+
         return new PoolResponseDTO(
                 pool.getId(),
                 pool.getName(),
@@ -40,7 +42,12 @@ public class PoolMapper {
                 pool.getMaxValuePerShare(),
                 pool.isFinalized(),
                 pool.getCreatedAt(),
-                pool.getOrganizer().getName()
+                pool.getOrganizer().getName(),
+                distributionResponseDTO
         );
+    }
+
+    public PoolResponseDTO toResponse (Pool pool){
+        return toResponse(pool, null);
     }
 }

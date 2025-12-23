@@ -1,5 +1,6 @@
 package com.brunothecoder.sweepstakes.api.dto.pool;
 
+import com.brunothecoder.sweepstakes.api.dto.megasena.GameDistributionResponseDTO;
 import com.brunothecoder.sweepstakes.domain.entities.LotteryType;
 import org.springframework.cglib.core.Local;
 
@@ -18,5 +19,6 @@ public record PoolResponseDTO(
    BigDecimal maxValuePerShare,
    boolean finalized,
    LocalDateTime createdAt,
-   String organizerName
+   String organizerName,
+   GameDistributionResponseDTO distributionResponseDTO
 ) {}
