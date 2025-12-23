@@ -48,4 +48,10 @@ public class UserController {
         User updated = userService.addRole(id, role);
         return ResponseEntity.ok(userMapper.toResponse(updated));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> updateName (@PathVariable UUID id, @RequestBody @Valid UserRequestDTO dto) {
+        User updated = userService.updateName(id, dto.name());
+        return ResponseEntity.ok(userMapper.toResponse(updated));
+    }
 }

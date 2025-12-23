@@ -1,6 +1,8 @@
 package com.brunothecoder.sweepstakes.api.dto.pool_generic;
 
 import com.brunothecoder.sweepstakes.domain.entities.LotteryType;
+import com.brunothecoder.sweepstakes.domain.entities.PoolStatus;
+import jdk.jshell.Snippet;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -18,6 +20,8 @@ public record GenericPoolResponseDTO(
         LocalDateTime drawDate,
         boolean finalized,
         UUID organizerId,
+        String organizerName,
+        PoolStatus status,
         LocalDateTime createdAt,
         List<GenericOptionResponseDTO> options
 

@@ -52,6 +52,8 @@ public class GenericPoolMapper {
                         genericPool.getDrawDate(),
                         genericPool.isFinalized(),
                         genericPool.getOrganizer().getId(),
+                        genericPool.getOrganizer().getName(),
+                        genericPool.getStatus(),
                         genericPool.getCreatedAt(),
                         optionResponses
                 );

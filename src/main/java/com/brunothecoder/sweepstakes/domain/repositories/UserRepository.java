@@ -6,9 +6,12 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
     boolean existsByWhatsapp(@NotBlank @Size(max = 20) @Pattern(regexp = "^\\+55\\d{10,11}$") String whatsapp);
+
+    Optional<User> findByWhatsapp(@NotBlank String whatsapp);
 }
 

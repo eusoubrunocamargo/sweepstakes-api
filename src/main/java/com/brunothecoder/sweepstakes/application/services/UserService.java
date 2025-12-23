@@ -4,7 +4,10 @@ import com.brunothecoder.sweepstakes.api.exceptions.ErrorMessages;
 import com.brunothecoder.sweepstakes.domain.entities.Role;
 import com.brunothecoder.sweepstakes.domain.entities.User;
 import com.brunothecoder.sweepstakes.domain.repositories.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,7 +39,7 @@ public class UserService {
     public User addRole(UUID userId, Role role){
         //check if user exists
         User user = userRepository.findById(userId).orElseThrow(
-                ()-> new IllegalArgumentException(ErrorMessages.USER_NOT_FOUND)
+                ()-> new EntityNotFoundException(ErrorMessages.USER_NOT_FOUND)
         );
         //add role
         user.getRoles().add(role);
@@ -45,5 +48,24 @@ public class UserService {
 
     public List<User>list(){
         return userRepository.findAll();
+    }
+
+    @Transactional
+    public User updateName(UUID userId, String name) {
+
+        //check name
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException(ErrorMessages.USER_INVALID_NAME);
+        }
+
+        //check if user exists
+        User user = userRepository.findById(userId).orElseThrow(
+                ()-> new EntityNotFoundException(ErrorMessages.USER_NOT_FOUND)
+        );
+
+        //update name
+        user.setName(name);
+
+        return userRepository.save(user);
     }
 }
