@@ -1,5 +1,6 @@
 package com.brunothecoder.sweepstakes.api.controllers;
 
+import com.brunothecoder.sweepstakes.api.dto.user.UpdateNameRequestDTO;
 import com.brunothecoder.sweepstakes.api.dto.user.UserRequestDTO;
 import com.brunothecoder.sweepstakes.api.dto.user.UserResponseDTO;
 import com.brunothecoder.sweepstakes.api.mappers.UserMapper;
@@ -50,7 +51,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> updateName (@PathVariable UUID id, @RequestBody @Valid UserRequestDTO dto) {
+    public ResponseEntity<UserResponseDTO> updateName (@PathVariable UUID id, @RequestBody @Valid UpdateNameRequestDTO dto) {
         User updated = userService.updateName(id, dto.name());
         return ResponseEntity.ok(userMapper.toResponse(updated));
     }
